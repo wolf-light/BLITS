@@ -121,7 +121,7 @@ void loop() {
     uint8_t* data = string_to_buf(message);
 
     if(send_packet(data, message.length(), SERVER_ADDRESS)) {
-      len = recieve_packet(responseSuccessful, 2000);
+      len = recieve_packet(responseSuccessful, 10000);
     }
     delete[] data;
   }
