@@ -10,13 +10,13 @@
 #define CLIENT_ADDRESS 1 //Football is client
 #define SERVER_ADDRESS 2 //Boombox is server
 
+//Class objects
+RH_RF95 driver(RFM95_CS, RFM95_INT);
+RHReliableDatagram manager(driver, CLIENT_ADDRESS);
+
 uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 uint8_t len = sizeof(buf);
 bool responseSuccessful = false;
-
-//Class objects
-RH_RF95 driver(RFM95_CS, RFM95_INT);
-RHReliableDatagram manager(driver, SERVER_ADDRESS);
 
 bool serial_setup() {
     Serial.begin(9600);
@@ -113,13 +113,16 @@ void setup() {
   radio_setup();
 }
 
-
 void loop() {
   responseSuccessful = false;
-  len = recieve_packet(responseSuccessful, 60000);
 
-  if (responseSuccessful) {
-    send_packet(buf, len, CLIENT_ADDRESS);
+  if (Serial.available() > 0) {
+    String message = Serial.readString();
+    uint8_t* data = string_to_buf(message);
+
+    if(send_packet(data, message.length(), SERVER_ADDRESS)) {
+      len = recieve_packet(responseSuccessful, 2000);
+    }
+    delete[] data;
   }
 }
-
