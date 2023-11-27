@@ -7,3 +7,9 @@ The BLITS system integrates the Avionics STIS (Static Test Ignition System) func
 Communicating via Radio Frequency with the Avionics handheld Football, the BLITS system Boombox not only oversees the collection of rocketry motor test data but also handles the long-range communication between the test site and the viewing site.
 
 This integrated system represents a fusion of the Avionics committee's Static Test Ignition System and the Hybrid committee's Hybrid Control System. Upon completion, it will offer compatibility for deployment in solid motor tests, hybrid motor tests, and the strand burner project.
+
+
+Lead Contributors:
+Ian Frantz       - Avionics Lead / Social Media Lead
+Jacob Korkowski  - Hybrid Lead / Safety Lead
+Dagan Larson     - Communications Lead
