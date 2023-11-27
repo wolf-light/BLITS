@@ -1,5 +1,9 @@
 # BLITS
 
-The "Ballistic Long-range Ignition Testing System" system combines the Avionics STIS (Static Test Ignition System) functionality with additional pressure and temperature data acquisition. The BLITS software will run on a Raspberry Pi. The BLITS system Boombox will input serial data into the Raspberry Pi via one USB cable providing thrust, pressure, and temperature data. The Raspberry Pi will work to store the data as it comes in. The BLITS system Boombox will work with the Avionics handheld Football to control the ignition of our rocket motor, in addition to collecting thrust, pressure, and temperature data as it comes in, and sending it to the Raspberry Pi.
+BLITS (Ballistic Long-range Ignition Testing System)
 
-This system is a combination of the Avionics committee's Static Test Ignition System and the Hybrid Control System. Once this system is complete, it will be compatible for use with solid motor tests, hybrid motor tests, and the strand burner project.
+The BLITS system integrates the Avionics STIS (Static Test Ignition System) functionality with advanced pressure and temperature data acquisition capabilities provided by the Hybrid committee. The BLITS software is designed to operate on a Raspberry Pi. The BLITS system Boombox interfaces with the Raspberry Pi via a single USB cable, delivering thrust, pressure, and temperature data. The Raspberry Pi efficiently processes and stores incoming data.
+
+Communicating via Radio Frequency with the Avionics handheld Football, the BLITS system Boombox not only oversees the collection of rocketry motor test data but also handles the long-range communication between the test site and the viewing site.
+
+This integrated system represents a fusion of the Avionics committee's Static Test Ignition System and the Hybrid committee's Hybrid Control System. Upon completion, it will offer compatibility for deployment in solid motor tests, hybrid motor tests, and the strand burner project.
