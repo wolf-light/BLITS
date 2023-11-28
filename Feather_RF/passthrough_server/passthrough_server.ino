@@ -120,7 +120,7 @@ int recieve_packet(bool& message_recieved, int timeout) {
       return -1;
     }
   } else {
-    DEBUG_SERIAL.println("no message");
+    //DEBUG_SERIAL.println("no rf message");
     return -1;
   }
 }
@@ -158,7 +158,15 @@ void setup() {
 
 void loop() {
   responseSuccessful = false;
-  len = recieve_packet(responseSuccessful, 60000);
+  
+  if (CONTROL_SERIAL.available() > 0) {
+    String serial_message = CONTROL_SERIAL.readString();
+    uint8_t* serial_bytes = string_to_buf(serial_message);
+    send_packet(serial_bytes, serial_message.length(), CLIENT_ADDRESS);
+    delete[] serial_bytes;
+  }
+
+  len = recieve_packet(responseSuccessful, 10000);
 
   if (responseSuccessful) {
     String message = byte_to_string(buf, len);
@@ -172,12 +180,12 @@ void loop() {
 
     CONTROL_SERIAL.print(message); // may have to change to println if that's what control system expects
     
-    recieve_response(message, 1000);
+    recieve_response(message, 10000);
 
     uint8_t* response = string_to_buf(message);
     uint8_t length = message.length();
     send_packet(response, length, CLIENT_ADDRESS);
 
     delete[] response;
-  }
+  } 
 }

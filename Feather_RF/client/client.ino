@@ -95,7 +95,7 @@ int recieve_packet(bool& message_recieved, int timeout) {
       return -1;
     }
   } else {
-    Serial.println("no message");
+    //Serial.println("no message");
     return -1;
   }
 }
@@ -125,4 +125,6 @@ void loop() {
     }
     delete[] data;
   }
+
+  recieve_packet(responseSuccessful, 1);
 }
