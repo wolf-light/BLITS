@@ -26,9 +26,9 @@
 #define DATA_BAUDRATE 115200
 
 #define CONTROL_SERIAL Serial1
-#define CONTROL_BAUDRATE 9600
+#define CONTROL_BAUDRATE 115200
 
-SoftwareSerial Serial1(6,5);
+SoftwareSerial Serial1(10,11);
 
 // Object declarations
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
@@ -60,10 +60,9 @@ void setArmState();
 void fire();
 
 bool serial_setup() {
-  #if DATA_SERIAL != CONTROL_SERIAL
   CONTROL_SERIAL.begin(CONTROL_BAUDRATE);
-  #endif
   DATA_SERIAL.begin(DATA_BAUDRATE);
+  CONTROL_SERIAL.println("serial ports initialized");
 }
 
 
