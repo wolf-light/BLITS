@@ -21,6 +21,15 @@
 #define SOL_PIN   A1
 #define SRVO_PIN  9
 
+#include <SoftwareSerial.h>
+#define DATA_SERIAL Serial
+#define DATA_BAUDRATE 115200
+
+#define CONTROL_SERIAL Serial1
+#define CONTROL_BAUDRATE 9600
+
+SoftwareSerial Serial1(6,5);
+
 // Object declarations
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
@@ -50,9 +59,16 @@ void setZero();
 void setArmState();
 void fire();
 
+bool serial_setup() {
+  #if DATA_SERIAL != CONTROL_SERIAL
+  CONTROL_SERIAL.begin(CONTROL_BAUDRATE);
+  #endif
+  DATA_SERIAL.begin(DATA_BAUDRATE);
+}
+
 
 void setup() {
-  Serial.begin(115200);
+  serial_setup();
   pinMode(SOL_PIN, OUTPUT);
   pinMode(HURTS_PIN, OUTPUT);
   LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
@@ -61,13 +77,13 @@ void setup() {
   #if (F_CPU == 16000000L)
   clock_prescale_set(clock_div_1);
   #endif
-  Servo.attach(SRVO_PIN);  
+  Servo.attach(SRVO_PIN);
 }
 
 void loop() {
 
-  if (Serial.available()>0){
-    entry= Serial.readString();
+  if (CONTROL_SERIAL.available()>0){
+    entry= CONTROL_SERIAL.readString();
     entry.trim();
 
     if (entry == "s"){
@@ -105,7 +121,7 @@ void loop() {
       if (entry == "fire"){
         fire();
       } else {
-        Serial.println("none fire reset");
+        CONTROL_SERIAL.println("none fire reset");
       }
     }
     entry = " ";
@@ -142,8 +158,8 @@ void sensorRead() {
 }
 
 void stopCheck() {
-  if (Serial.available()>0){
-    entry = Serial.readString();
+  if (CONTROL_SERIAL.available()>0){
+    entry = CONTROL_SERIAL.readString();
     entry.trim();
     if (entry =! "fire"){
       stop();
@@ -152,11 +168,11 @@ void stopCheck() {
 }
 
 void stop() {
-  Serial.println("fire aborted type resume");
+  CONTROL_SERIAL.println("fire aborted type resume");
   while (entry != "resume"){
     Servo.write(0);
-    if (Serial.available()>0){
-      entry = Serial.readString();
+    if (CONTROL_SERIAL.available()>0){
+      entry = CONTROL_SERIAL.readString();
       entry.trim();
     }
   }
@@ -170,59 +186,59 @@ void zero() {
 }
 
 void check() {
-  if (Serial.available()>0){
-    entry = Serial.readString();
+  if (CONTROL_SERIAL.available()>0){
+    entry = CONTROL_SERIAL.readString();
     entry.trim();
   }
 }
 
 void setFireTime() {
-  Serial.println("enter value");
+  CONTROL_SERIAL.println("enter value");
   while (entry == "delay") {
-    if (Serial.available()>0){
-      fireTime = Serial.parseFloat()*1000;
-      Serial.print("value set to ");
-      Serial.println(fireTime, DEC);
+    if (CONTROL_SERIAL.available()>0){
+      fireTime = CONTROL_SERIAL.parseFloat()*1000;
+      CONTROL_SERIAL.print("value set to ");
+      CONTROL_SERIAL.println(fireTime, DEC);
       entry = " ";
     }
   }
 }
 
 void setServoSpeed() {
- Serial.println("enter value");
+ CONTROL_SERIAL.println("enter value");
   while (entry == "speed"){
-    if (Serial.available()>0){
-      servoSpeed = Serial.parseFloat();
-      Serial.print("value set to ");
-      Serial.println(servoSpeed, DEC);
+    if (CONTROL_SERIAL.available()>0){
+      servoSpeed = CONTROL_SERIAL.parseFloat();
+      CONTROL_SERIAL.print("value set to ");
+      CONTROL_SERIAL.println(servoSpeed, DEC);
       entry = " ";
     }
   }
 }
 
 void setOpenAngle() {
-  Serial.println("enter value");
+  CONTROL_SERIAL.println("enter value");
   while (entry == "angle"){
-    if (Serial.available()>0){
-      openAngle = Serial.parseFloat();
-      Serial.print("value set to ");
-      Serial.println(openAngle);
+    if (CONTROL_SERIAL.available()>0){
+      openAngle = CONTROL_SERIAL.parseFloat();
+      CONTROL_SERIAL.print("value set to ");
+      CONTROL_SERIAL.println(openAngle);
       entry = " ";
     }
   }
 }
 
 void setArmState() {
-  Serial.println("arm ignition system? yes/no");
+  CONTROL_SERIAL.println("arm ignition system? yes/no");
   while (entry == "start"){
     check();
   }
   if (entry == "yes"){
     armState = true;
-    Serial.println("ignition is armed go for fire");
+    CONTROL_SERIAL.println("ignition is armed go for fire");
   } else {
       armState = false;
-      Serial.println("not armed go for fire without ignition");
+      CONTROL_SERIAL.println("not armed go for fire without ignition");
   }
 }
 

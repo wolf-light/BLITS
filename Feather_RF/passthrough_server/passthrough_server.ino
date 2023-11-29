@@ -10,7 +10,7 @@
 #define CLIENT_ADDRESS 1 //Football is client
 #define SERVER_ADDRESS 2 //Boombox is server
 
-#define CONTROL_SERIAL Serial
+#define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 9600
 #define CONTROL_RESPONSE_DELAY 1000
 
@@ -149,9 +149,7 @@ bool recieve_response(String& message, const unsigned long& waitMillis) {
 }
 
 void setup() {
-  #if DEBUG_SERIAL != CONTROL_SERIAL
   setup_debug_serial();
-  #endif
   setup_control_serial();
   radio_setup();
 }
@@ -171,14 +169,11 @@ void loop() {
   if (responseSuccessful) {
     String message = byte_to_string(buf, len);
 
-    #if DEBUG_SERIAL == CONTROL_SERIAL
-    DEBUG_SERIAL.println();
-    #else
+    
     DEBUG_SERIAL.print("Message forwarded: ");
     DEBUG_SERIAL.println(message);
-    #endif
 
-    CONTROL_SERIAL.print(message); // may have to change to println if that's what control system expects
+    CONTROL_SERIAL.println(message); // may have to change to println if that's what control system expects
     
     recieve_response(message, 10000);
 

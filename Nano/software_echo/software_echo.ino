@@ -1,7 +1,7 @@
 
 #include <SoftwareSerial.h>
 
-SoftwareSerial Serial1(5, 6);
+SoftwareSerial Serial1(6, 5);
 
 void setup() {
     Serial.begin(9600);
@@ -16,7 +16,7 @@ void setup() {
 void loop() {
     if (Serial1.available() > 0) {
         String message = Serial1.readString();
-        Serial.print(message);
-        Serial1.print(message);
+        Serial.println(message);
+        Serial1.println(message);
     }
 }
