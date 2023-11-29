@@ -18,6 +18,13 @@ uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 uint8_t len = sizeof(buf);
 bool responseSuccessful = false;
 
+enum class STATE {
+  DEFAULT,
+  READ_DATA
+};
+
+int notmybool = 0;
+
 bool serial_setup() {
     Serial.begin(9600);
     while (!Serial) {
@@ -56,6 +63,14 @@ void print_byte(uint8_t const byte_arr[], const int& arr_len) {
   }
 }
 
+String buf_to_string(uint8_t const byte_arr[], const int& arr_len) {
+  String str("");
+  for (size_t i = 0; i < arr_len; i++) {
+    str += static_cast<char>(byte_arr[i]);
+  }
+  return str;
+}
+
 void print_string_dst_len(const String& string, const int& address, const int& len) {
   Serial.print(string);
   Serial.print(" 0x");
@@ -88,7 +103,9 @@ int recieve_packet(bool& message_recieved, int timeout) {
     if (manager.recvfromAck(buf, &len, &from)) { // note len var declared each call
       print_string_dst_len("recieved message from", from, len);
       print_byte(buf, len);
-      message_recieved = true;
+      if (len > 0) {
+        message_recieved = true;
+      }
       return len;
     } else {
       Serial.println("No reply, is rf95_reliable_datagram_server running?");
@@ -113,18 +130,30 @@ void setup() {
   radio_setup();
 }
 
+
+
 void loop() {
   responseSuccessful = false;
+  if (notmybool == 0) {
+      if (Serial.available() > 0) {
+        String message = Serial.readString();
+        uint8_t* data = string_to_buf(message);
+        if (message == "fire") {
+          notmybool = 1;
+        }
 
-  if (Serial.available() > 0) {
-    String message = Serial.readString();
-    uint8_t* data = string_to_buf(message);
+        if(send_packet(data, message.length(), SERVER_ADDRESS)) {
+          len = recieve_packet(responseSuccessful, 5000);
+          if (buf_to_string(buf, len) == "reading data") {
+            notmybool = 1;
+          }
+        }
+        delete[] data;
+      }
 
-    if(send_packet(data, message.length(), SERVER_ADDRESS)) {
-      len = recieve_packet(responseSuccessful, 10000);
-    }
-    delete[] data;
+      recieve_packet(responseSuccessful, 1);
+      
+  } else {
+    recieve_packet(responseSuccessful, 100);
   }
-
-  recieve_packet(responseSuccessful, 1);
 }

@@ -45,6 +45,7 @@ int servoSpeed = 11;
 int openAngle = 90;
 float pos = 0;
 String entry = "zero";
+bool readingDataSent = false;
 
 // Function declarations
 void sensorRead();
@@ -127,8 +128,10 @@ void loop() {
   }
 }
 void sensorRead() {
-  Serial.print(millis());
+  unsigned long read_time = millis();
+  Serial.print(read_time);
   Serial.print(",");
+  CONTROL_SERIAL.println(read_time);
 
   double c = ThermoCouple.readCelsius();
   Serial.print(c);
@@ -242,7 +245,10 @@ void setArmState() {
 }
 
 void fire() {
-
+  if (!readingDataSent) {
+          CONTROL_SERIAL.println("reading data");
+          readingDataSent = true;
+        }
   if (entry != "s"){
     startTime = millis();
     while (millis() - startTime < Buffer){
