@@ -1,7 +1,7 @@
 // Libraries
 #include <Adafruit_TiCoServo.h>
-#include <avr/power.h>
-#include <SPI.h>
+//#include <avr/power.h>
+// #include <SPI.h>
 #include <SoftwareSerial.h>
 #include "Adafruit_MAX31855.h"
 #include "HX711.h"
@@ -23,10 +23,10 @@
 #define DATA_SERIAL Serial
 #define DATA_BAUDRATE 115200
 
-#define CONTROL_SERIAL Serial1
+#define CONTROL_SERIAL Serial
 #define CONTROL_BAUDRATE 9600
 
-#define DIFFERENT_SERIALS //Use this define if the two above serials are different
+//#define DIFFERENT_SERIALS //Use this define if the two above serials are different
 
 const char* safe_message = "system state: SAFE, enter \"start\" to marm system";
 const char* marm_message = "system state: MARM, enter \"yes\" to prime system";
@@ -49,6 +49,7 @@ HX711 LoadCell;
 STATE state = STATE::SAFE;
 String command;
 bool armState = false;
+unsigned long readTime;
 
 const unsigned long fireTime = 15000;
 const unsigned long dataOffset = 5000;
@@ -86,8 +87,10 @@ void proccess_current_state() {
 }
 
 void sensor_read() {
+    readTime = millis();
     data = "";
-    Serial.print(millis());
+    CONTROL_SERIAL.println(readTime);
+    Serial.print(readTime);
     Serial.print(",");
 
     double c = ThermoCouple.readCelsius();
@@ -151,11 +154,11 @@ void setup() {
 
 void loop() {
     if (CONTROL_SERIAL.available() > 0) {
-        message = CONTROL_SERIAL.readString();
+        command = CONTROL_SERIAL.readString();
         if (command == "read data") {
-            test_data_reading();
+           // test_data_reading();
         } else if (command == "info") {
-            print_system_info();
+           // print_system_info();
         } else if (command == "safe") {
             state = STATE::SAFE;
             proccess_current_state();
@@ -183,7 +186,10 @@ void loop() {
             if (relativeTime - dataOffset > hurtsTime) {
                 armState = false;
                 digitalWrite(HURTS_PIN, LOW);
-            }g today at 4 in Edu50 as usual. Wel
+            }
+        }
+        if (relativeTime - dataOffset > fireTime) {
+            state = STATE::SAFE;
         }
         sensor_read();
         break;

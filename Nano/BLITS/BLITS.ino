@@ -26,7 +26,7 @@
 #define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 9600
 
-#define DIFFERENT_SERIALS //Use this define if the two above serials are different
+//#define DIFFERENT_SERIALS //Use this define if the two above serials are different
 
 enum class STATE {
    SAFE,
@@ -98,7 +98,7 @@ void fire() {
 
 bool read_serial() {
     if (CONTROL_SERIAL.available() > 0) {
-        message = CONTROL_SERIAL.readString();
+        command = CONTROL_SERIAL.readString();
         return true;
     }
     return false;
