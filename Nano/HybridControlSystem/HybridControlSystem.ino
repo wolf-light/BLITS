@@ -28,7 +28,9 @@
 #define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 9600
 
-SoftwareSerial Serial1(6,5);
+#define DIFFERENT_SERIALS //Use this define if the two above serials are different
+
+SoftwareSerial Serial1(10,11);
 
 // Object declarations
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
@@ -60,7 +62,7 @@ void setArmState();
 void fire();
 
 bool serial_setup() {
-  #if DATA_SERIAL != CONTROL_SERIAL
+  #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.begin(CONTROL_BAUDRATE);
   #endif
   DATA_SERIAL.begin(DATA_BAUDRATE);
