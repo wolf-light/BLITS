@@ -175,7 +175,13 @@ void loop() {
 
     CONTROL_SERIAL.print(message); // may have to change to println if that's what control system expects
 
-    recieve_response(message, 10000);
+    if (message == "read data") {
+      String sensorData;
+      sensorData = recieve_response(message, 20000);
+      Serial.print(sensorData);
+    } else {
+      recieve_response(message, 10000);
+    }
 
     uint8_t* response = string_to_buf(message);
     uint8_t length = message.length();

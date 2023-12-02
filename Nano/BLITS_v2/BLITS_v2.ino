@@ -92,36 +92,51 @@ void proccess_current_state() {
 }
 
 void sensor_read() {
+int i=0;
+while (i<20){
   String data;
     readTime = millis();
     data = "";
-    CONTROL_SERIAL.println(readTime);
     Serial.print(readTime);
     Serial.print(",");
+    data += readTime;
+    data += ",";
 
     double c = ThermoCouple.readCelsius();
     Serial.print(c);
     Serial.print(",");
+    data += c;
+    data += ",";
 
     float m = LoadCell.get_units(0);
     Serial.print(m);
     Serial.print(",");
+    data += m;
+    data += ",";
 
     float p = analogRead(PS1_PIN);
     Serial.print(p);
     Serial.print(",");
+    data += p;
+    data += ",";
 
     p = analogRead(PS2_PIN);
     Serial.print(p);
     Serial.print(",");
+    data += p;
+    data += ",";
 
     p = analogRead(PS3_PIN);
     Serial.print(p);
     Serial.print(",");
+    data += p;
 
     //Serial.print(pos);
     //Servo.write(pos);
     Serial.println();
+    CONTROL_SERIAL.println(data);
+    i++;
+}
 }
 
 void safe_to_marm() {
@@ -163,6 +178,7 @@ void loop() {
         command = CONTROL_SERIAL.readString();
         if (command == "read data") {
            // test_data_reading();
+           sensor_read();
         } else if (command == "info") {
            // print_system_info();
         } else if (command == "safe") {
@@ -176,23 +192,6 @@ void loop() {
             prime_to_fire();
         } else {
             Serial1.print("Invalid Command: ");Serial1.print(command);
-        }
-    }
-    else if (DATA_SERIAL.available() > 0) {
-        command = DATA_SERIAL.readString();
-        if (command == "read data") {
-           // test_data_reading();
-        } else if (command == "info") {
-           // print_system_info();
-        } else if (command == "safe") {
-            state = STATE::SAFE;
-            proccess_current_state();
-        } else if (command == "start") {
-            safe_to_marm();
-        } else if (command == "yes") {
-            marm_to_prime();
-        } else if (command == "fire") {
-            prime_to_fire();
         }
     }
     
