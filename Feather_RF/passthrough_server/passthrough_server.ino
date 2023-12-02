@@ -173,8 +173,8 @@ void loop() {
     DEBUG_SERIAL.print("Message forwarded: ");
     DEBUG_SERIAL.println(message);
 
-    CONTROL_SERIAL.println(message); // may have to change to println if that's what control system expects
-    
+    CONTROL_SERIAL.print(message); // may have to change to println if that's what control system expects
+
     recieve_response(message, 10000);
 
     uint8_t* response = string_to_buf(message);

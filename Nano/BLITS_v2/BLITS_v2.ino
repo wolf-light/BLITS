@@ -1,7 +1,7 @@
 // Libraries
 #include <Adafruit_TiCoServo.h>
-//#include <avr/power.h>
-// #include <SPI.h>
+#include <avr/power.h>
+#include <SPI.h>
 #include <SoftwareSerial.h>
 #include "Adafruit_MAX31855.h"
 #include "HX711.h"
@@ -19,14 +19,16 @@
 #define PS3_PIN  A5
 
 #define HURTS_PIN A3
+#define SOL_PIN   A1
+#define SRVO_PIN  9
 
 #define DATA_SERIAL Serial
 #define DATA_BAUDRATE 115200
 
-#define CONTROL_SERIAL Serial
+#define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 9600
 
-//#define DIFFERENT_SERIALS //Use this define if the two above serials are different
+#define DIFFERENT_SERIALS //Use this define if the two above serials are different
 
 const char* safe_message = "system state: SAFE, enter \"start\" to marm system";
 const char* marm_message = "system state: MARM, enter \"yes\" to prime system";
@@ -45,6 +47,7 @@ enum class STATE {
 SoftwareSerial Serial1(10,11);
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
+Adafruit_TiCoServo Servo;
 
 STATE state = STATE::SAFE;
 String command;
@@ -58,10 +61,10 @@ unsigned long fireStart;
 unsigned long relativeTime;
 
 bool serial_setup() {
+  DATA_SERIAL.begin(DATA_BAUDRATE);
   #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.begin(CONTROL_BAUDRATE);
   #endif
-  DATA_SERIAL.begin(DATA_BAUDRATE);
 }
 
 void proccess_current_state() {
@@ -69,10 +72,12 @@ void proccess_current_state() {
     {
     case STATE::SAFE:
         CONTROL_SERIAL.println(safe_message);
+        DATA_SERIAL.println(safe_message);
         armState = false;
         break;
     case STATE::MARM:
         CONTROL_SERIAL.println(marm_message);
+        DATA_SERIAL.println(marm_message);
         armState = false;
         break;
     case STATE::PRIME:
@@ -80,13 +85,14 @@ void proccess_current_state() {
         armState = true;
         break;
     case STATE::FIRE:
-        CONTROL_SERIAL.prinln(fire_message);
+        CONTROL_SERIAL.println(fire_message);
         fireStart = millis();
         break;
     }
 }
 
 void sensor_read() {
+  String data;
     readTime = millis();
     data = "";
     CONTROL_SERIAL.println(readTime);
@@ -127,7 +133,7 @@ void safe_to_marm() {
 
 void marm_to_prime() {
     if (state == STATE::MARM) {
-        state = STATE::PRIME
+        state = STATE::PRIME;
     }
     proccess_current_state();
 }
@@ -155,6 +161,25 @@ void setup() {
 void loop() {
     if (CONTROL_SERIAL.available() > 0) {
         command = CONTROL_SERIAL.readString();
+        if (command == "read data") {
+           // test_data_reading();
+        } else if (command == "info") {
+           // print_system_info();
+        } else if (command == "safe") {
+            state = STATE::SAFE;
+            proccess_current_state();
+        } else if (command == "start") {
+            safe_to_marm();
+        } else if (command == "yes") {
+            marm_to_prime();
+        } else if (command == "fire") {
+            prime_to_fire();
+        } else {
+            Serial1.print("Invalid Command: ");Serial1.print(command);
+        }
+    }
+    else if (DATA_SERIAL.available() > 0) {
+        command = DATA_SERIAL.readString();
         if (command == "read data") {
            // test_data_reading();
         } else if (command == "info") {
