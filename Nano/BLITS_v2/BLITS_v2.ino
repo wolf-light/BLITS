@@ -91,9 +91,9 @@ void proccess_current_state() {
     }
 }
 
-void sensor_read() {
+void test_data_reading() {
 int i=0;
-while (i<20){
+while (i<6){
   String data;
     readTime = millis();
     data = "";
@@ -139,6 +139,37 @@ while (i<20){
 }
 }
 
+void sensor_read() {
+    readTime = millis();
+    Serial.print(readTime);
+    Serial.print(",");
+
+    double c = ThermoCouple.readCelsius();
+    Serial.print(c);
+    Serial.print(",");
+
+    float m = LoadCell.get_units(0);
+    Serial.print(m);
+    Serial.print(",");
+
+    float p = analogRead(PS1_PIN);
+    Serial.print(p);
+    Serial.print(",");
+
+    p = analogRead(PS2_PIN);
+    Serial.print(p);
+    Serial.print(",");
+
+    p = analogRead(PS3_PIN);
+    Serial.print(p);
+    Serial.print(",");
+
+    //Serial.print(pos);
+    //Servo.write(pos);
+    Serial.println();
+}
+
+
 void safe_to_marm() {
     if (state == STATE::SAFE) {
         state = STATE::MARM;
@@ -177,8 +208,7 @@ void loop() {
     if (CONTROL_SERIAL.available() > 0) {
         command = CONTROL_SERIAL.readString();
         if (command == "read data") {
-           // test_data_reading();
-           sensor_read();
+           test_data_reading();
         } else if (command == "info") {
            // print_system_info();
         } else if (command == "safe") {
