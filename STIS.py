@@ -150,6 +150,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             text = text.rstrip('\r\n')
             terminals[buttonNumber-1].append(text)
             
+            #write to adjacent directory
+            file_path = "../data/data.txt"
+            with open(file_path, 'w') as file:
+                file.write(text)
+            
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
         currentTime = now.strftime("%H:%M:%S")
