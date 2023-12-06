@@ -30,7 +30,7 @@ def send_serial_message(port, message):
     except serial.SerialException as e:
         print(f"Error: {e}")
         
-serial_port = 'COM3' 
+serial_port = '/dev/ttyACM0' 
 
 message_to_send = "test message"
 
