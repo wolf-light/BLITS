@@ -1,5 +1,4 @@
 // Libraries
-#include <Adafruit_TiCoServo.h>
 #include <avr/power.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
@@ -26,7 +25,7 @@
 #define DATA_BAUDRATE 115200
 
 #define CONTROL_SERIAL Serial1
-#define CONTROL_BAUDRATE 9600
+#define CONTROL_BAUDRATE 115200
 
 #define DIFFERENT_SERIALS //Use this define if the two above serials are different
 
@@ -47,7 +46,6 @@ enum class STATE {
 SoftwareSerial Serial1(10,11);
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
-Adafruit_TiCoServo Servo;
 
 STATE state = STATE::SAFE;
 String command;
@@ -75,7 +73,10 @@ void proccess_current_state() {
         DATA_SERIAL.println(safe_message);
         armState = false;
         break;
-    case STATE::MARM:
+    case STATE::M#if (F_CPU == 16000000L)
+  clock_prescale_set(clock_div_1);
+  #endif
+  Servo.attach(SRVO_PIN);ARM:
         CONTROL_SERIAL.println(marm_message);
         DATA_SERIAL.println(marm_message);
         armState = false;
@@ -94,79 +95,32 @@ void proccess_current_state() {
 void test_data_reading() {
 int i=0;
 while (i<6){
-  String data;
-    readTime = millis();
-    data = "";
-    Serial.print(readTime);
-    Serial.print(",");
-    data += readTime;
-    data += ",";
-
-    double c = ThermoCouple.readCelsius();
-    Serial.print(c);
-    Serial.print(",");
-    data += c;
-    data += ",";
-
-    float m = LoadCell.get_units(0);
-    Serial.print(m);
-    Serial.print(",");
-    data += m;
-    data += ",";
-
-    float p = analogRead(PS1_PIN);
-    Serial.print(p);
-    Serial.print(",");
-    data += p;
-    data += ",";
-
-    p = analogRead(PS2_PIN);
-    Serial.print(p);
-    Serial.print(",");
-    data += p;
-    data += ",";
-
-    p = analogRead(PS3_PIN);
-    Serial.print(p);
-    Serial.print(",");
-    data += p;
-
-    //Serial.print(pos);
-    //Servo.write(pos);
-    Serial.println();
-    CONTROL_SERIAL.println(data);
+    CONTROL_SERIAL.println(sensor_read());
     i++;
 }
 }
 
-void sensor_read() {
-    readTime = millis();
-    Serial.print(readTime);
-    Serial.print(",");
+String sensor_read() {
+    String data("");
+    data += millis();
+    data += ",";
 
-    double c = ThermoCouple.readCelsius();
-    Serial.print(c);
-    Serial.print(",");
+    data += ThermoCouple.readCelsius();
+    data += ",";
 
-    float m = LoadCell.get_units(0);
-    Serial.print(m);
-    Serial.print(",");
+    data += LoadCell.get_units(0);
+    data += ",";
 
-    float p = analogRead(PS1_PIN);
-    Serial.print(p);
-    Serial.print(",");
+    data += analogRead(PS1_PIN);
+    data += ",";
 
-    p = analogRead(PS2_PIN);
-    Serial.print(p);
-    Serial.print(",");
+    data = analogRead(PS2_PIN);
+    data += ",";
 
-    p = analogRead(PS3_PIN);
-    Serial.print(p);
-    Serial.print(",");
+    data += analogRead(PS3_PIN);
 
-    //Serial.print(pos);
-    //Servo.write(pos);
-    Serial.println();
+    Serial.println(data);
+    return data;
 }
 
 
@@ -198,10 +152,6 @@ void setup() {
   LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
   LoadCell.set_scale(4883);              // found with HX_set_persistent example code
   LoadCell.tare();
-  #if (F_CPU == 16000000L)
-  clock_prescale_set(clock_div_1);
-  #endif
-  Servo.attach(SRVO_PIN);
 }
 
 void loop() {
@@ -221,7 +171,8 @@ void loop() {
         } else if (command == "fire") {
             prime_to_fire();
         } else {
-            Serial1.print("Invalid Command: ");Serial1.print(command);
+            Serial1.print("Invalid Command: ");
+            Serial1.println(command);
         }
     }
     

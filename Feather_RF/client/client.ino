@@ -26,7 +26,7 @@ enum class STATE {
 };
 
 bool serial_setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial) {
         ;
     }

@@ -1,6 +1,17 @@
+# ide files
 .idea/
+.vscode/
+
+# local files
 local/
 *.local.*
+.env
+
+# c++ files
 *.out
 *.o
-.vscode/
+
+# python files
+__pycache__/
+venv/
+
