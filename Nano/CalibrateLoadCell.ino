@@ -23,7 +23,7 @@
  Arduino pin 2 -> HX711 CLK
  3 -> DOUT
  5V -> VCC
- GND -> GND
+ GND -> GND9600
 
  Most any pin on the Arduino Uno will be compatible with DOUT/CLK.
 

@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.infoFormat = '<span id="info" style="color:black;">{}</span>'
         
         # Maximum of 3 serial channels, more are possible
-        self.serial1 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(1))
+        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyACM0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(1))
         self.serial1Options = {}
         self.serial2 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(2))
         self.serial2Options = {}
@@ -150,6 +150,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             text = text.rstrip('\r\n')
             terminals[buttonNumber-1].append(text)
             
+            #write to adjacent directory
+            #file_path = "../data/data.txt"
+            #with open(file_path, 'w') as file:
+            #    file.write(text)
+            
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
         currentTime = now.strftime("%H:%M:%S")
@@ -220,3 +225,6 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
+else:
+    print("error running STIS.py, main file may have changed, please update documentation")
+

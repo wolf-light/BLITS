@@ -26,7 +26,7 @@ enum class STATE {
 };
 
 bool serial_setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     while (!Serial) {
         ;
     }
@@ -123,15 +123,5 @@ void setup() {
 void loop() {
   responseSuccessful = false;
 
-  if (Serial.available() > 0) {
-    String message = Serial.readString();
-    uint8_t* data = string_to_buf(message);
-
-    if(send_packet(data, message.length(), SERVER_ADDRESS)) {
-      len = recieve_packet(responseSuccessful, 10000);
-    }
-    delete[] data;
-  }
-
-  recieve_packet(responseSuccessful, 1);
+  recieve_packet(responseSuccessful, 1000);
 }
