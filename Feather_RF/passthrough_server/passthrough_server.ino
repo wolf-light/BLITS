@@ -188,5 +188,5 @@ void loop() {
     send_packet(response, length, CLIENT_ADDRESS);
 
     delete[] response;
-  } 
+  }
 }
