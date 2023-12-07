@@ -225,3 +225,6 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
+else:
+    print("error running STIS.py, main file may have changed, please update documentation")
+
