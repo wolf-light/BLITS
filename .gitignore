@@ -3,3 +3,6 @@ local/
 *.local.*
 *.out
 *.o
+__pycache__
+venv/
+.vscode/
