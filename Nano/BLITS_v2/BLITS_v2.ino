@@ -6,6 +6,9 @@
 #include "Adafruit_MAX31855.h"
 #include "HX711.h"
 
+// Variable Definitions
+#define calibration_factor -1750.0
+
 // Pin definitions
 #define TC_DO_PIN   3
 #define TC_CS_PIN   4
@@ -16,7 +19,7 @@
 
 #define PS1_PIN  A7
 #define PS2_PIN  A6
-#define PS3_PIN  A5
+// #define PS3_PIN  A5
 
 #define HURTS_PIN A3
 #define SOL_PIN   A1
@@ -26,7 +29,7 @@
 #define DATA_BAUDRATE 115200
 
 #define CONTROL_SERIAL Serial1
-#define CONTROL_BAUDRATE 9600
+#define CONTROL_BAUDRATE 115200
 
 #define DIFFERENT_SERIALS //Use this define if the two above serials are different
 
@@ -44,7 +47,7 @@ enum class STATE {
 };
 
 // Object declarations
-SoftwareSerial Serial1(10,11);
+SoftwareSerial Serial1(A5,A4);
 Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
 Adafruit_TiCoServo Servo;
@@ -82,6 +85,7 @@ void proccess_current_state() {
         break;
     case STATE::PRIME:
         CONTROL_SERIAL.println(prime_message);
+        DATA_SERIAL.println(prime_message);
         armState = true;
         break;
     case STATE::FIRE:
@@ -91,9 +95,9 @@ void proccess_current_state() {
     }
 }
 
-void test_data_reading() {
+void test_data_reading(int counts) {
 int i=0;
-while (i<6){
+while (i<counts){
   String data;
     readTime = millis();
     data = "";
@@ -126,10 +130,10 @@ while (i<6){
     data += p;
     data += ",";
 
-    p = analogRead(PS3_PIN);
-    Serial.print(p);
-    Serial.print(",");
-    data += p;
+    // p = analogRead(PS3_PIN);
+    // Serial.print(p);
+    // Serial.print(",");
+    // data += p;
 
     //Serial.print(pos);
     //Servo.write(pos);
@@ -160,9 +164,9 @@ void sensor_read() {
     Serial.print(p);
     Serial.print(",");
 
-    p = analogRead(PS3_PIN);
-    Serial.print(p);
-    Serial.print(",");
+    // p = analogRead(PS3_PIN);
+    // Serial.print(p);
+    // Serial.print(",");
 
     //Serial.print(pos);
     //Servo.write(pos);
@@ -196,7 +200,7 @@ void setup() {
   pinMode(SOL_PIN, OUTPUT);
   pinMode(HURTS_PIN, OUTPUT);
   LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
-  LoadCell.set_scale(4883);              // found with HX_set_persistent example code
+  LoadCell.set_scale(calibration_factor);              // found with HX_set_persistent example code
   LoadCell.tare();
   #if (F_CPU == 16000000L)
   clock_prescale_set(clock_div_1);
@@ -208,7 +212,7 @@ void loop() {
     if (CONTROL_SERIAL.available() > 0) {
         command = CONTROL_SERIAL.readString();
         if (command == "read data") {
-           test_data_reading();
+           test_data_reading(6);
         } else if (command == "info") {
            // print_system_info();
         } else if (command == "safe") {

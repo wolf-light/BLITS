@@ -19,7 +19,7 @@ uint8_t len = sizeof(buf);
 bool responseSuccessful = false;
 
 bool serial_setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial) {
         ;
     }
