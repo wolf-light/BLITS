@@ -57,11 +57,11 @@ String command;
 bool armState = false;
 unsigned long readTime;
 
-const unsigned long fireTime = 15000;
-const unsigned long dataOffset = 5000;
-const unsigned long hurtsTime = 2000;
-unsigned long fireStart;
-unsigned long relativeTime;
+const unsigned int fireTime = 180000;
+const unsigned int dataOffset = 5000;
+const unsigned int hurtsTime = 2000;
+unsigned int fireStart;
+unsigned int relativeTime;
 
 bool serial_setup() {
   DATA_SERIAL.begin(DATA_BAUDRATE);
@@ -239,18 +239,33 @@ void loop() {
         break;
     case STATE::FIRE:
         relativeTime = millis() - fireStart;
+        Serial.println("Relative Time Set");
+        Serial.println(relativeTime);
         if (armState && relativeTime > dataOffset) {
+          Serial.println("In First IF");
             digitalWrite(HURTS_PIN, HIGH);
             if (relativeTime - dataOffset > hurtsTime) {
+              Serial.println("In Second HURTS IF");
                 armState = false;
                 digitalWrite(HURTS_PIN, LOW);
             }
         }
+        Serial.println("Outside of First Main If Loop Thing");
         if (relativeTime - dataOffset > fireTime) {
+          Serial.println("Inside Final IF Loop");
             state = STATE::SAFE;
-        }
+        } else {
+          Serial.println("Skipped final IF loop, in else");
+        // while(CONTROL_SERIAL.available() == 0){
         sensor_read();
-        break;
+        // }
+        }
+        // break;
     }
 
 }
+
+// Data Offset is how much it collects before ignition
+// Relative Time is time relative to start of fire (end of countdown)
+// Hurts Time length of ematch (hurts) ignition power
+// Fire Time is length of data collection after ignition sequence
