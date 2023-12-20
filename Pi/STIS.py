@@ -25,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
-        print("Initializing")
+        #print("Initializing")
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
         self.comConnect2.clicked.connect(lambda: self.connectToSerial(2))
@@ -47,7 +47,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.infoFormat = '<span id="info" style="color:black;">{}</span>'
         
         # Maximum of 3 serial channels, more are possible
-        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyACM0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(1))
+        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyUSB0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(1))
         self.serial1Options = {}
         self.serial2 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(2))
         self.serial2Options = {}
