@@ -152,10 +152,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             text = text.rstrip('\r\n')
             terminals[buttonNumber-1].append(text)
             
-            #write to adjacent directory
-            #file_path = "../data/data.txt"
-            #with open(file_path, 'w') as file:
-            #    file.write(text)
+            #preliminary save function
+            with open("../data/datatest.txt", 'w') as file:
+                line = self.serial1.readLine().decode().strip()
+                file.write(line +"\n") 
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
