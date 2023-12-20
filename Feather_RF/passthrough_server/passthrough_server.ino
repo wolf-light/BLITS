@@ -11,11 +11,11 @@
 #define SERVER_ADDRESS 2 //Boombox is server
 
 #define CONTROL_SERIAL Serial1
-#define CONTROL_BAUDRATE 9600
+#define CONTROL_BAUDRATE 115200
 #define CONTROL_RESPONSE_DELAY 1000
 
 #define DEBUG_SERIAL Serial
-#define DEBUG_BAUDRATE 9600
+#define DEBUG_BAUDRATE 115200
 
 
 //Class objects

@@ -63,7 +63,7 @@ bool armState = false;
 unsigned long readTime;
 
 // Times used in FIRE state of loop()
-const unsigned long fireTime = 15000;
+const unsigned long fireTime = 180000;
 const unsigned long dataOffset = 5000;
 const unsigned long hurtsTime = 2000;
 unsigned long fireStart;
@@ -77,6 +77,7 @@ void set_calibration_factors() {
 }
 
 void print_system_info() {
+    String data("");
     data = "Calibration Factors: ";
     // Put calibration factors here
     data += " TIMES: fireTime(";
@@ -90,15 +91,15 @@ void print_system_info() {
 }
 
 void print_both(String message) {
-    #if DIFFERENT_SERIALS
+    // #if DIFFERENT_SERIALS
     CONTROL_SERIAL.println(message);
-    #endif
+    // #endif
     DATA_SERIAL.println(message);
 }
 
 void test_data_reading() {
     int i=0;
-    while (i<6){
+    while (i<1000){
         CONTROL_SERIAL.println(sensor_read());
         i++;
     }
@@ -112,17 +113,22 @@ String sensor_read() {
     data += ThermoCouple.readCelsius();
     data += ",";
 
-    data += LoadCell.get_units(0);
+    // data += LoadCell.get_units(0);
+    data += 0.00;
     data += ",";
 
-    data += analogRead(PS1_PIN);
+    // data += analogRead(PS1_PIN);
+    data += 0.00;
     data += ",";
 
-    data = analogRead(PS2_PIN);
+    // data = analogRead(PS2_PIN);
+    data += 0.00;
     data += ",";
 
-    data += analogRead(PS3_PIN);
+    // data += analogRead(PS3_PIN);
+    data += 0.00;
 
+    // print_both(data);
     DATA_SERIAL.println(data);
     return data;
 }
@@ -136,7 +142,7 @@ bool serial_setup() {
   while(!DATA_SERIAL || !CONTROL_SERIAL) {
     ; // wait for serial connections to finish
   }
-  print_both()
+  // print_both();
 }
 
 void setup_ematch() {
@@ -157,8 +163,8 @@ void proccess_current_state() {
         print_both(safe_message);
         armState = false;
         break;
-    case STATE::MARM
-        print_both(marm_message)
+    case STATE::MARM:
+        print_both(marm_message);
         armState = false;
         break;
     case STATE::PRIME:
@@ -203,6 +209,8 @@ void loop() {
     if (CONTROL_SERIAL.available() > 0) {
         command = CONTROL_SERIAL.readString();
         if (command == "read data") {
+            print_both("Data Read");
+            delay(3000);
            test_data_reading();
         } else if (command == "info") {
            print_system_info();
