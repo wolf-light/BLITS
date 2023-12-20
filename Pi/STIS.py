@@ -25,6 +25,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
+        print("Initializing")
+        
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
         self.comConnect2.clicked.connect(lambda: self.connectToSerial(2))
         self.comConnect3.clicked.connect(lambda: self.connectToSerial(3))
