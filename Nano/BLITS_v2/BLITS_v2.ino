@@ -34,11 +34,13 @@
 #define Software_RX 10
 #define Software_TX 11
 
+
+/*--------------READ THE BELOW COMMENTS----------------------*/
 /**
  * This is defined when using both the built in serial of the nano, either with RX TX or USB, and two digital pins as a softwareSerial connection.
  * Comment the below out when using just one Serial connection.
 */
-#define DIFFERENT_SERIALS //Use this define if the two serials are different
+#define DIFFERENT_SERIALS //Use this define if the two serials are different (comment out if using 1 serial connection)
 
 const char* safe_message = "system state: (1)SAFE, enter \"start\" to marm system";
 const char* marm_message = "system state: (2)MARM, enter \"yes\" to prime system";
@@ -70,11 +72,11 @@ bool armState = false;
 unsigned long readTime;
 
 // Times used in FIRE state of loop()
-const unsigned long fireTime = 180000;
-const unsigned long dataOffset = 5000;
-const unsigned long hurtsTime = 2000;
-unsigned long fireStart;
-unsigned long relativeTime;
+unsigned long fireTime = 180000; // length of data collection after ignition
+unsigned long dataOffset = 5000; // length of data collection before ignition
+unsigned long hurtsTime = 2000; // length of fire of hurts (ematch) pin
+unsigned long fireStart; // start of the fire from millis()
+unsigned long relativeTime; // time relative to fireStart
 
 // Calibration factors
 const int testReadings = 6;
@@ -96,6 +98,10 @@ void print_system_info() {
     print_both(data);
 }
 
+/**
+ * Completes the logic for if messages are sent to both serial connections
+ * Dependent on the if there are two serial connections or just one
+*/
 void print_both(String message) {
     #if DIFFERENT_SERIALS
     CONTROL_SERIAL.println(message);
