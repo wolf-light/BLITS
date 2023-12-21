@@ -34,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            cred = credentials.Certificate("C:\Users\adamc\OneDrive\Desktop\BLITZALT\BLITS\Pi\google-services.json")  # Replace with your service account JSON file path
+            cred = credentials.Certificate("./google-services.json")  # Replace with your service account JSON file path
             firebase_admin.initialize_app(cred, {'databaseURL': 'https://console.firebase.google.com/project/realtimetest-11796/firestore/data/~2FArduinoData~2Ftestdata'})
         except:
             print("failed to connect to firebase")
