@@ -23,6 +23,7 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from firebase_admin import firestore
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
@@ -34,8 +35,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            cred = credentials.Certificate("./google-services.json")  # Replace with your service account JSON file path
-            firebase_admin.initialize_app(cred, {'databaseURL': 'https://console.firebase.google.com/project/realtimetest-11796/firestore/data/~2FArduinoData~2Ftestdata'})
+            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-2817424d83.json")  # Replace with your service account JSON file path
+            firebase_admin.initialize_app(cred)
+            print("connected to firebase")
         except:
             print("failed to connect to firebase")
         
