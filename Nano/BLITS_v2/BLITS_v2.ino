@@ -27,10 +27,17 @@
 #define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 115200
 
-// If using softwareSerial use Serial1 for control serial
+/**
+ * If using softwareSerial use Serial1 for control serial
+ * Make sure these are the right pins that you're using 
+*/
 #define Software_RX 10
 #define Software_TX 11
 
+/**
+ * This is defined when using both the built in serial of the nano, either with RX TX or USB, and two digital pins as a softwareSerial connection.
+ * Comment the below out when using just one Serial connection.
+*/
 #define DIFFERENT_SERIALS //Use this define if the two serials are different
 
 const char* safe_message = "system state: (1)SAFE, enter \"start\" to marm system";
@@ -38,10 +45,10 @@ const char* marm_message = "system state: (2)MARM, enter \"yes\" to prime system
 const char* prime_message= "system state: (3)PRIME, enter \"fire\" to fire";
 const char* fire_message = "system state: (4)FIRE, reading test data";
 
-const char* serial_setup_msg = "";
-const char* loadcell_setup_msg = "";
-const char* thermocouple_setup_msg = "";
-const char* ematch_setup_mesg = "";
+const char* serial_setup_msg = "serial setup complete";
+const char* loadcell_setup_msg = "loadcell setup complete";
+const char* thermocouple_setup_msg = "tc setup complete";
+const char* ematch_setup_mesg = "ematch setup complete";
 
 // KEEP IN ACENDING ORDER OF DANGER
 enum class STATE {
@@ -69,16 +76,15 @@ const unsigned long hurtsTime = 2000;
 unsigned long fireStart;
 unsigned long relativeTime;
 
-
 // Calibration factors
+const int testReadings = 6;
 
 void set_calibration_factors() {
     print_both("enter calibration factors");
 }
 
 void print_system_info() {
-    String data("");
-    data = "Calibration Factors: ";
+    String data = "Calibration Factors: ";
     // Put calibration factors here
     data += " TIMES: fireTime(";
     data += fireTime;
@@ -91,15 +97,15 @@ void print_system_info() {
 }
 
 void print_both(String message) {
-    // #if DIFFERENT_SERIALS
+    #if DIFFERENT_SERIALS
     CONTROL_SERIAL.println(message);
-    // #endif
+    #endif
     DATA_SERIAL.println(message);
 }
 
 void test_data_reading() {
     int i=0;
-    while (i<1000){
+    while (i<testReadings){
         CONTROL_SERIAL.println(sensor_read());
         i++;
     }
@@ -113,22 +119,17 @@ String sensor_read() {
     data += ThermoCouple.readCelsius();
     data += ",";
 
-    // data += LoadCell.get_units(0);
-    data += 0.00;
+    data += LoadCell.get_units(0);
     data += ",";
 
-    // data += analogRead(PS1_PIN);
-    data += 0.00;
+    data += analogRead(PS1_PIN);
     data += ",";
 
-    // data = analogRead(PS2_PIN);
-    data += 0.00;
+    data = analogRead(PS2_PIN);
     data += ",";
 
-    // data += analogRead(PS3_PIN);
-    data += 0.00;
+    data += analogRead(PS3_PIN);
 
-    // print_both(data);
     DATA_SERIAL.println(data);
     return data;
 }
@@ -142,17 +143,19 @@ bool serial_setup() {
   while(!DATA_SERIAL || !CONTROL_SERIAL) {
     ; // wait for serial connections to finish
   }
-  // print_both();
+  print_both(serial_setup_msg);
 }
 
 void setup_ematch() {
     pinMode(HURTS_PIN, OUTPUT);
+    print_both(ematch_setup_mesg);
 }
 
 void setup_loadcell() {
     LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
     LoadCell.set_scale(4883); // found with HX_set_persistent example code
     LoadCell.tare();
+    print_both(loadcell_setup_msg);
 }
 
 //---------ON STATE TRANSITION------------------------//
@@ -160,11 +163,12 @@ void proccess_current_state() {
     switch (state) 
     {
     case STATE::SAFE:
+        digitalWrite(HURTS_PIN, LOW);
         print_both(safe_message);
         armState = false;
         break;
-    case STATE::MARM:
-        print_both(marm_message);
+    case STATE::MARM
+        print_both(marm_message)
         armState = false;
         break;
     case STATE::PRIME:
@@ -195,6 +199,14 @@ void marm_to_prime() {
 
 void prime_to_fire() {
     if (state == STATE::PRIME) {
+        now = millis();
+        while(millis() - now > 10000) {
+            if (CONTROL_SERIAL.available() > 0) {
+                state = STATE::SAFE;
+                proccess_current_state();
+                return;
+            }
+        }
         state = STATE::FIRE;
     }
     proccess_current_state();
@@ -209,8 +221,6 @@ void loop() {
     if (CONTROL_SERIAL.available() > 0) {
         command = CONTROL_SERIAL.readString();
         if (command == "read data") {
-            print_both("Data Read");
-            delay(3000);
            test_data_reading();
         } else if (command == "info") {
            print_system_info();
@@ -245,7 +255,6 @@ void loop() {
             digitalWrite(HURTS_PIN, HIGH);
             if (relativeTime - dataOffset > hurtsTime) {
                 armState = false;
-                digitalWrite(HURTS_PIN, LOW);
             }
         }
         if (relativeTime - dataOffset > fireTime) {
