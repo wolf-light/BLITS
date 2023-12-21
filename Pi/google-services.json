@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "286839140740",
+    "project_id": "realtimetest-11796",
+    "storage_bucket": "realtimetest-11796.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286839140740:android:3e592efb0cef0120a4edd1",
+        "android_client_info": {
+          "package_name": "com.company.testdata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9cNf4DhD-ObHmmh2Jmv-J8SqWnY27efQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

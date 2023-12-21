@@ -20,12 +20,24 @@ import http.client as httplib
 
 from datetime import datetime
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
+        
+        
         #print("Initializing")
+        # Initialize Firebase Admin SDK
+        try:
+            cred = credentials.Certificate("C:\Users\adamc\OneDrive\Desktop\BLITZALT\BLITS\Pi\google-services.json")  # Replace with your service account JSON file path
+            firebase_admin.initialize_app(cred, {'databaseURL': 'https://console.firebase.google.com/project/realtimetest-11796/firestore/data/~2FArduinoData~2Ftestdata'})
+        except:
+            print("failed to connect to firebase")
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
         self.comConnect2.clicked.connect(lambda: self.connectToSerial(2))
