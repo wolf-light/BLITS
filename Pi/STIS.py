@@ -157,6 +157,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tabWidget.tabBar().setTabTextColor(buttonNumber-1, color)
             selectedChannel.close()
     
+    '''
     @pyqtSlot()
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
@@ -176,6 +177,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                             file.flush()
             except:
                 print("failed to live write to file")
+    '''
+    
+    @pyqtSlot()
+def receive(self, buttonNumber):
+    terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
+    file_name = f"data.txt"  # Change the file name as needed
+
+    with open(file_name, 'a') as file:
+        while self.serialChannels[buttonNumber-1].canReadLine():
+            text = self.serialChannels[buttonNumber-1].readLine()
+            text = text.data().decode()
+            text = text.rstrip('\r\n')
+
+            # Append received data to terminalOutput
+            terminals[buttonNumber-1].append(text)
+
+            # Write received data to file
+            file.write(text + '\n')
+            file.flush()  # Ensure data is written immediately
+
+            # Optionally, you can print the received data
+            #print(text)
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
