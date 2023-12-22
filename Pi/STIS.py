@@ -167,9 +167,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             terminals[buttonNumber-1].append(text)
             
             #preliminary save function
-            with open("../data/datatest.txt", 'w') as file:
-                line = self.serial1.readLine().decode().strip()
-                file.write(line +"\n") 
+            try:
+                with open('./data.txt', 'w') as file:
+                    while True:
+                        if self.serial1.in_waiting > 0:
+                            data = self.serial1.readline().decode().strip()
+                            file.write(data +'\n')
+                            file.flush()
+            except:
+                print("failed to live write to file")
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
