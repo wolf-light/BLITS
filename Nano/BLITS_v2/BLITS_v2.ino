@@ -13,6 +13,8 @@
 #define LC_DAT_PIN  6
 #define LC_CLK_PIN  7
 
+#define LC_calibration_factor -1750.0
+
 #define PS1_PIN  A7
 #define PS2_PIN  A6
 #define PS3_PIN  A5
@@ -113,8 +115,8 @@ String sensor_read() {
     data += ThermoCouple.readCelsius();
     data += ",";
 
-    // data += LoadCell.get_units(0);
-    data += 0.00;
+    data += LoadCell.get_units();
+    // data += 0.00;
     data += ",";
 
     // data += analogRead(PS1_PIN);
@@ -150,9 +152,11 @@ void setup_ematch() {
 }
 
 void setup_loadcell() {
+  print_both("Initializing Load Cell...");
     LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
-    LoadCell.set_scale(4883); // found with HX_set_persistent example code
+    LoadCell.set_scale(LC_calibration_factor); // found with HX_set_persistent example code
     LoadCell.tare();
+  print_both("Load Cell Initialized!!!");
 }
 
 //---------ON STATE TRANSITION------------------------//
@@ -203,6 +207,7 @@ void prime_to_fire() {
 //---------SETUP AND LOOP FUNCTIONS------------------------//
 void setup() {
   serial_setup();
+  setup_loadcell();
 }
 
 void loop() {
