@@ -2,8 +2,15 @@
 #include <avr/power.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
-#include "Adafruit_MAX31855.h"
+#include <Wire.h>
+#include <Adafruit_I2CDevice.h>
+#include <Adafruit_I2CRegister.h>
+#include "Adafruit_MCP9600.h"
 #include "HX711.h"
+
+#define I2C_ADDRESS (0x67)
+
+Adafruit_MCP9600 mcp;
 
 // Pin definitions
 #define TC_DO_PIN   3
@@ -64,7 +71,7 @@ enum class STATE {
 
 // Object declarations
 SoftwareSerial Serial1(Software_RX,Software_TX);
-Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
+// Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
 
 // Universal Variables
@@ -81,7 +88,7 @@ unsigned long fireStart; // start of the fire from millis()
 unsigned long relativeTime; // time relative to fireStart
 
 // Calibration factors
-const int testReadings = 6;
+const int testReadings = 1000;
 
 void set_calibration_factors() {
     print_both("enter calibration factors");
@@ -96,7 +103,33 @@ void print_system_info() {
     data += dataOffset;
     data += ") hurtsTime(";
     data += hurtsTime;
-    data += ")";
+    data += ") ";
+    data += "Thermocouple type set to ";
+    switch (mcp.getThermocoupleType()) {
+      case MCP9600_TYPE_K:  data += "K"; break;
+      case MCP9600_TYPE_J:  data += "J"; break;
+      case MCP9600_TYPE_T:  data += "T"; break;
+      case MCP9600_TYPE_N:  data += "N"; break;
+      case MCP9600_TYPE_S:  data += "S"; break;
+      case MCP9600_TYPE_E:  data += "E"; break;
+      case MCP9600_TYPE_B:  data += "B"; break;
+      case MCP9600_TYPE_R:  data += "R"; break;
+    }
+    data += " type, ";
+    data += "Filter coefficient value set to: ";
+    data += mcp.getFilterCoefficient();
+    data += ", Alert #1 temperature set to ";
+    data += mcp.getAlertTemperature(1);
+    data += ", ";
+    data += "ADC resolution set to ";
+    switch (mcp.getADCresolution()) {
+      case MCP9600_ADCRESOLUTION_18:   data += "18"; break;
+      case MCP9600_ADCRESOLUTION_16:   data += "16"; break;
+      case MCP9600_ADCRESOLUTION_14:   data += "14"; break;
+      case MCP9600_ADCRESOLUTION_12:   data += "12"; break;
+    }
+    data += " bits";
+    delay(1000);
     print_both(data);
 }
 
@@ -105,9 +138,9 @@ void print_system_info() {
  * Dependent on the if there are two serial connections or just one
 */
 void print_both(String message) {
-    #if DIFFERENT_SERIALS
+    // #if DIFFERENT_SERIALS
     CONTROL_SERIAL.println(message);
-    #endif
+    // #endif
     DATA_SERIAL.println(message);
 }
 
@@ -124,20 +157,24 @@ String sensor_read() {
     data += millis();
     data += ",";
 
-    data += ThermoCouple.readCelsius();
+    // data += ThermoCouple.readCelsius();
+    data += mcp.readThermocouple();
     data += ",";
 
     data += LoadCell.get_units();
     // data += 0.00;
     data += ",";
 
-    data += analogRead(PS1_PIN);
+    // data += analogRead(PS1_PIN);
+    data += 0.00;
     data += ",";
 
-    data = analogRead(PS2_PIN);
+    // data = analogRead(PS2_PIN);
+    data += 0.00;
     data += ",";
 
-    data += analogRead(PS3_PIN);
+    // data += analogRead(PS3_PIN);
+    data += 0.00;
 
     DATA_SERIAL.println(data);
     return data;
@@ -161,11 +198,33 @@ void setup_ematch() {
 }
 
 void setup_loadcell() {
-  print_both("Initializing Load Cell...");
     LoadCell.begin(LC_DAT_PIN, LC_CLK_PIN);
     LoadCell.set_scale(LC_calibration_factor); // found with HX_set_persistent example code
+    delay(1000);
     LoadCell.tare();
     print_both(loadcell_setup_msg);
+}
+
+void setup_thermocouple() {
+    /* Initialise the driver with I2C_ADDRESS and the default I2C bus. */
+    if (! mcp.begin(I2C_ADDRESS)) {
+        Serial.println("Sensor not found. Check wiring!");
+        while (1);
+    }
+
+  mcp.setADCresolution(MCP9600_ADCRESOLUTION_18);
+  
+  mcp.setThermocoupleType(MCP9600_TYPE_K);
+
+  mcp.setFilterCoefficient(3);
+
+  mcp.setAlertTemperature(1, 30);
+
+  mcp.configureAlert(1, true, true);  // alert 1 enabled, rising temp
+
+  mcp.enable(true);
+
+  print_both(thermocouple_setup_msg);
 }
 
 //---------ON STATE TRANSITION------------------------//
@@ -177,8 +236,8 @@ void proccess_current_state() {
         print_both(safe_message);
         armState = false;
         break;
-    case STATE::MARM
-        print_both(marm_message)
+    case STATE::MARM:
+        print_both(marm_message);
         armState = false;
         break;
     case STATE::PRIME:
@@ -209,7 +268,7 @@ void marm_to_prime() {
 
 void prime_to_fire() {
     if (state == STATE::PRIME) {
-        now = millis();
+        int now = millis();
         while(millis() - now > 10000) {
             if (CONTROL_SERIAL.available() > 0) {
                 state = STATE::SAFE;
@@ -226,6 +285,7 @@ void prime_to_fire() {
 void setup() {
   serial_setup();
   setup_loadcell();
+  setup_thermocouple();
 }
 
 void loop() {
