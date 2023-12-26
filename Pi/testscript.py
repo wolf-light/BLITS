@@ -30,10 +30,7 @@ def send_serial_message(port, message):
     except serial.SerialException as e:
         print(f"Error: {e}")
         
-serial_port = '/dev/ttyACM0' 
-
-message_to_send = "test message"
-
-send_serial_message(serial_port, message_to_send)
-    
-    
+if __name__ == "__main__":
+    serial_port = '/dev/ttyACM0' 
+    message_to_send = "test message"
+    send_serial_message(serial_port, message_to_send)
