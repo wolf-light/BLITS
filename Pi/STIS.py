@@ -35,7 +35,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-2817424d83.json")  # Replace with your service account JSON file path
+            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
             firebase_admin.initialize_app(cred)
             print("connected to firebase")
         except:
@@ -180,25 +180,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     '''
     
     @pyqtSlot()
-def receive(self, buttonNumber):
-    terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
-    file_name = f"data.txt"  # Change the file name as needed
+    def receive(self, buttonNumber):
+        terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
+        file_name = f"data.txt"  # Change the file name as needed
 
-    with open(file_name, 'a') as file:
-        while self.serialChannels[buttonNumber-1].canReadLine():
-            text = self.serialChannels[buttonNumber-1].readLine()
-            text = text.data().decode()
-            text = text.rstrip('\r\n')
+        with open(file_name, 'a') as file:
+            while self.serialChannels[buttonNumber-1].canReadLine():
+                text = self.serialChannels[buttonNumber-1].readLine()
+                text = text.data().decode()
+                text = text.rstrip('\r\n')
 
-            # Append received data to terminalOutput
-            terminals[buttonNumber-1].append(text)
+                # Append received data to terminalOutput
+                terminals[buttonNumber-1].append(text)
 
-            # Write received data to file
-            file.write(text + '\n')
-            file.flush()  # Ensure data is written immediately
+                # Write received data to file
+                file.write(text + '\n')
+                file.flush()  # Ensure data is written immediately
 
-            # Optionally, you can print the received data
-            #print(text)
+                # Optionally, you can print the received data
+                #print(text)
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
