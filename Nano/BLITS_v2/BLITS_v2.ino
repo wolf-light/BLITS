@@ -150,6 +150,7 @@ void test_data_reading() {
         CONTROL_SERIAL.println(sensor_read());
         i++;
     }
+    proccess_current_state();
 }
 
 String sensor_read() {
@@ -171,10 +172,10 @@ String sensor_read() {
 
     // data = analogRead(PS2_PIN);
     data += 0.00;
-    data += ",";
+    // data += ",";
 
     // data += analogRead(PS3_PIN);
-    data += 0.00;
+    // data += 0.00;
 
     DATA_SERIAL.println(data);
     return data;
@@ -208,7 +209,7 @@ void setup_loadcell() {
 void setup_thermocouple() {
     /* Initialise the driver with I2C_ADDRESS and the default I2C bus. */
     if (! mcp.begin(I2C_ADDRESS)) {
-        Serial.println("Sensor not found. Check wiring!");
+        print_both("Sensor not found. Check wiring!");
         while (1);
     }
 
