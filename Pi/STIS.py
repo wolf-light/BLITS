@@ -200,6 +200,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 # Write received data to file
                 file.write(text + '\n')
                 file.flush()  # Ensure data is written immediately
+                #changed tests here
                 doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
