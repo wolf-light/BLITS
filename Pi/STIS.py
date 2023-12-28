@@ -26,6 +26,8 @@ from firebase_admin import db
 from firebase_admin import firestore
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    firebaseConnection = True
+    
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
@@ -39,9 +41,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             firebase_admin.initialize_app(cred, {
             'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
             })
-            
+            firebaseConnection = True
             print("connected to firebase")
         except:
+            firebaseConnection = False
             print("failed to connect to firebase")
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
@@ -201,7 +204,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 file.write(text + '\n')
                 file.flush()  # Ensure data is written immediately
                 #changed tests here
-                doc_ref.child('STIStest').push(text)
+                
+                if(self.firebaseConnection == True):
+                    doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
             
