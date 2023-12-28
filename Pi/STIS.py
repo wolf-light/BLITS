@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            if(internetConnectionPresent):
+            if(internetConnectionPresent == True):
                 cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
                 firebase_admin.initialize_app(cred, {
                 'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
@@ -207,8 +207,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 file.flush()  # Ensure data is written immediately
                 #changed tests here
                 
-                if(internetConnectionPresent):
+                try:
                     doc_ref.child('STIStest').push(text)
+                except:
+                    print("oopsie bad connection")
+                    
                 # Optionally, you can print the received data
                 #print(text)
             
