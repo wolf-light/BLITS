@@ -20,10 +20,26 @@ import http.client as httplib
 
 from datetime import datetime
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import firestore
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
+        
+        
+        
+        #print("Initializing")
+        # Initialize Firebase Admin SDK
+        try:
+            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
+            firebase_admin.initialize_app(cred)
+            print("connected to firebase")
+        except:
+            print("failed to connect to firebase")
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
         self.comConnect2.clicked.connect(lambda: self.connectToSerial(2))
@@ -45,7 +61,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.infoFormat = '<span id="info" style="color:black;">{}</span>'
         
         # Maximum of 3 serial channels, more are possible
-        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyACM0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(1))
+        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyUSB0', baudRate=QtSerialPort.QSerialPort.Baud115200, readyRead=lambda: self.receive(1))
         self.serial1Options = {}
         self.serial2 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(2))
         self.serial2Options = {}
@@ -141,6 +157,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tabWidget.tabBar().setTabTextColor(buttonNumber-1, color)
             selectedChannel.close()
     
+    '''
     @pyqtSlot()
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
@@ -150,10 +167,38 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             text = text.rstrip('\r\n')
             terminals[buttonNumber-1].append(text)
             
-            #write to adjacent directory
-            #file_path = "../data/data.txt"
-            #with open(file_path, 'w') as file:
-            #    file.write(text)
+            #preliminary save function
+            try:
+                with open('./data.txt', 'w') as file:
+                    while True:
+                        if self.serial1.in_waiting > 0:
+                            data = self.serial1.readline().decode().strip()
+                            file.write(data +'\n')
+                            file.flush()
+            except:
+                print("failed to live write to file")
+    '''
+    
+    @pyqtSlot()
+    def receive(self, buttonNumber):
+        terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
+        file_name = f"data.txt"  # Change the file name as needed
+
+        with open(file_name, 'a') as file:
+            while self.serialChannels[buttonNumber-1].canReadLine():
+                text = self.serialChannels[buttonNumber-1].readLine()
+                text = text.data().decode()
+                text = text.rstrip('\r\n')
+
+                # Append received data to terminalOutput
+                terminals[buttonNumber-1].append(text)
+
+                # Write received data to file
+                file.write(text + '\n')
+                file.flush()  # Ensure data is written immediately
+
+                # Optionally, you can print the received data
+                #print(text)
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
