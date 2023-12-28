@@ -10,20 +10,28 @@ import http.client as httplib
 
 from datetime import datetime
 
-def firestoreTest():
+def realtimeTest():
     cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
+    })
+    
+    ref = db.reference('/')
     print("connected to firebase")
     
-    db = firestore.client()
-    doc_ref = db.collection('ArduinoData').document('test')
-    doc_snap = doc_ref.get()
+    data = {
+        'name' : 'John',
+        'age' : 30,
+        'email' : 'test1'
+    }
     
-    x = doc_snap.get('v1')
-    
-    print(x)
+    ref.child('users').push(data)
+    print("\nDATA PUSHED TO REALTIME\n")
     
 def main():
     print("main function\n")
-    firestoreTest()
+    realtimeTest()
+    
+if __name__ == "__main__":
+    main()
     
