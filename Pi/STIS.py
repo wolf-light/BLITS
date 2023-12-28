@@ -199,7 +199,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 # Write received data to file
                 file.write(text + '\n')
                 file.flush()  # Ensure data is written immediately
-                db.child('STIStest').push(text)
+                doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
             
