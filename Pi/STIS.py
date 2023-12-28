@@ -273,4 +273,16 @@ if __name__ == "__main__":
 else:
     print("error running STIS.py, main file may have changed, please update documentation")
 
-
+'''{
+  "type": "service_account",
+  "project_id": "realtimetest-11796",
+  "private_key_id": "04f6034e2095f40eda2c596850fd2431cfb5afb1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjrDzmueIaGQtm\nIEKg0pQdJFnpQ/yXDZI2YFvE88HMDS7o3p5vVLD0N7yiOZ0nV4JY8bAZZRIP+YmH\nwi2HsQ2QZQmskSgYatycmLygsxCNFy5fCx+I+Iytowzwi4QO1W+vgy+9jbFazt35\nAF20evz1FSc+cM/VcI1OKo1lmQSKRbl2VWbPRv9+g2nUA5J11aoZqO5KQh1I7Mn7\nda0NwFZYNRI61aPyJbmL3RDE1SG85LfwmY1I9WOCMQ+v73y+cmDxNShU7pLe12zU\n3SQ3R433zQM2siR67Q3lbyHqLDS9PLFjHm6lTmGkRfNP8CD6nvoB+qL1ZulbtF+T\n1X1S+CGxAgMBAAECggEAC14aUb0N0Nm18rchYYmWm2qLqxmbeMNKySeKoCR87Ibq\n3+YcU2eqrZ+UZKEDQvj/Nt28aRsdtMnUTT9FicPYiROXZyqiwgVkAqVSDog5SU9X\nm2bKnykCHkoxiyBpgN0+l05RecUWURQGkzV9DJyxJnV8ZwgPS0f4rHnkna6Rw+ek\ntVM5yG6QprYJg/9G66iPYAWwOYgOVYOChLvebflil96NNe077rxx9tyCrW1N8AE3\nXH0xTNqm0eLiNdeqDOsjl8s8z6KXEoUZpWypS3ik+zg1KdAs3AJnPM2tZr+Xonfy\ni+eJi8QxnFSxFWSiIX5xBwDeIcWzMrMTKW7VdUwo8QKBgQDkjLgfQqukJieXvjsD\nSd9GNTvz8aT6/LycPyPq4xlDjhi1+YRkpN2ia1wTnVy9u2wgjQ5K1j856+hcRyNY\ndXagTUvQ14evwR8+Rj+mtfmN6/hN88H8Vq47VZV+3ZRrAVTJo4HnhdMPAOw/rqeo\npMm+8OqjuzFUQE8nNw09uzuGuQKBgQC3VLsuHnOBLjkFq9XArrZe6QUZUrwaUkVo\ngkxEAqWURcsHoEVuJzoEvyZzcuuKOAudol0GvpW6pbmdj4b0trN7EpPOQJFLzfj2\noxHtXPnHwWl2AILeYjzP4PhY/x+QI3/M34KTK3nW3KTjXFifz2HSG6C6ekOzbVpY\nWYU6Xm72uQKBgQCnCyLX1kbVZv2xLty6/pcuHWKAXbGTsH26RXvfBbVFZuowtvpJ\nBSbou0dFHtLV6dKRyAcWM5lqoD3olCYFVXUqnNQ5BA6sKp7HSVjkZETNshZ+AxdZ\nc5FM1LS7UQBVZVevOM6NhYZJhQcnVGQ+IpNB95vHp93aElbH9ri60cokIQKBgAY6\nz92CVWR3YKKrsyjIBxR0kKLKp++xCgDCJLtO57eBI6QPsyxKEvOkVzcnGY/p1aM2\nqDiZc1cTWJpdDTX1m2W8PN+OXCGaTzJ6WhqZxTcfgGjtHYVXCz/5IhdMHBN20Vnx\n4msD2DEP8F51feF4V5efLrgHfZN0TNShviA8o0KpAoGBAIiMfvpjn0qsUzGVSC0t\nCAASGHN/bEb/JhiGOA3gzzgoY5q1Uwf9AJpURowU7+wwM6QuAHNw6DfeuQtSpVaL\nYOyksCA1NvpHAzSCBkxcg5EMCJbHGY6kAeMk8cMZt+Y5tUttz+g3AHJv6QvTLTDT\nqRjRh6wprjqRMkZ6ptg5yV+E\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-tbluh@realtimetest-11796.iam.gserviceaccount.com",
+  "client_id": "114272851737000473699",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-tbluh%40realtimetest-11796.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}'''
