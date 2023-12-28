@@ -19,13 +19,13 @@ def realtimeTest():
     ref = db.reference('/')
     print("connected to firebase")
     
-    data = {
-        'name' : 'John',
-        'age' : 30,
-        'email' : 'test1'
-    }
+    nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    for x in nums:
+        print(x)
+        ref.child('loop test').push(nums[x])
+        
     
-    ref.child('users').push(data)
+    
     print("\nDATA PUSHED TO REALTIME\n")
     
 def main():
