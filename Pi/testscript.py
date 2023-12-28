@@ -1,36 +1,29 @@
-import sys
-from PyQt5 import QtCore, QtWidgets, uic, QtSerialPort
-from PyQt5.QtCore import QRunnable, pyqtSlot
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
-
-from MainWindow import Ui_MainWindow
-
 import serial.tools.list_ports
 import serial
 import time
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import firestore
 
 import http.client as httplib
 
 from datetime import datetime
 
-def send_serial_message(port, message):
-    try:
-        ser = serial.Serial(port, baudrate=9600, timeout=1)
-        print(f"Connected to {ser.name}")
+def firestoreTest():
+    cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
+    firebase_admin.initialize_app(cred)
+    print("connected to firebase")
     
-        time.sleep(2)
+    db = firestore.client()
+    doc_ref = db.collection('ArduinoData').document('test')
+    doc_snap = doc_ref.get()
     
-        encoded_message = message.encode('utf-8')
+    x = doc_snap.get('v1')
     
-        ser.write(encoded_message)
-        print(f"message sent: {message}")
+    print(x)
     
-        ser.close()
-    except serial.SerialException as e:
-        print(f"Error: {e}")
-        
-if __name__ == "__main__":
-    serial_port = '/dev/ttyACM0' 
-    message_to_send = "test message"
-    send_serial_message(serial_port, message_to_send)
+def main():
+    print("main function\n")
+    firestoreTest()
+    
