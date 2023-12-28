@@ -37,12 +37,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
-            firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
-            })
-            firebaseConnection = True
-            print("connected to firebase")
+            if(internetConnectionPresent):
+                cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
+                firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
+                })
+                firebaseConnection = True
+                print("connected to firebase")
         except:
             firebaseConnection = False
             print("failed to connect to firebase")
@@ -189,7 +190,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
         file_name = f"data.txt"  # Change the file name as needed
-        doc_ref = db.reference('/')
+        if(internetConnectionPresent):
+            doc_ref = db.reference('/')
 
         with open(file_name, 'a') as file:
             while self.serialChannels[buttonNumber-1].canReadLine():
@@ -205,7 +207,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 file.flush()  # Ensure data is written immediately
                 #changed tests here
                 
-                if(self.firebaseConnection == True):
+                if(internetConnectionPresent):
                     doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
