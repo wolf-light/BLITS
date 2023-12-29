@@ -1,37 +1,10 @@
-import serial.tools.list_ports
-import serial
-import time
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
-from firebase_admin import firestore
+import unittest
+import STIS
 
-import http.client as httplib
-
-from datetime import datetime
-
-def realtimeTest():
-    cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
-    })
+class testSTIS(unittest.TestCase):
     
-    ref = db.reference('/')
-    print("connected to firebase")
-    
-    nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    for x in nums:
-        print(x)
-        ref.child('loop test').push(nums[x])
+    def test_underscore(self):
+        print("test1")
+        t1 = STIS.internetConnectionPresent()
+        self.assertEqual(t1, True)
         
-    
-    
-    print("\nDATA PUSHED TO REALTIME\n")
-    
-def main():
-    print("main function\n")
-    realtimeTest()
-    
-if __name__ == "__main__":
-    main()
-    
