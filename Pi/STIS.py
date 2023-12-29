@@ -26,12 +26,12 @@ from firebase_admin import db
 from firebase_admin import firestore
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    firebaseConnection = True
-    
+    firebaseConnection = True  
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
+        self._defaultPortString = "COMM6"
         
         
         #print("Initializing")
@@ -67,13 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.warningFormat = '<span style="color:orange;">{}</span>'
         self.infoFormat = '<span id="info" style="color:black;">{}</span>'
         
-        # Maximum of 3 serial channels, more are possible
-        self.serial1 = QtSerialPort.QSerialPort('/dev/ttyUSB0', baudRate=QtSerialPort.QSerialPort.Baud115200, readyRead=lambda: self.receive(1))
-        self.serial1Options = {}
-        self.serial2 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(2))
-        self.serial2Options = {}
-        self.serial3 = QtSerialPort.QSerialPort('COM6', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(3))
-        self.serial3Options = {}
+        self.mapSerialPorts(self._defaultPortString, self._defaultPortString, self._defaultPortString)
         self.serialChannels = [self.serial1, self.serial2, self.serial3]
         
         self.tabs = [self.tab, self.tab2, self.tab3]
@@ -82,7 +76,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.populateComPorts()
         
         self.updateInternetStatus()
-            
+    
+    def mapSerialPorts(self, port1, port2, port3):
+        # Maximum of 3 serial channels, more are possible
+        self.serial1 = QtSerialPort.QSerialPort(port1, baudRate=QtSerialPort.QSerialPort.Baud115200, readyRead=lambda: self.receive(1))
+        self.serial1Options = {}
+        self.serial2 = QtSerialPort.QSerialPort(port2, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(2))
+        self.serial2Options = {}
+        self.serial3 = QtSerialPort.QSerialPort(port3, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=lambda: self.receive(3))
+        self.serial3Options = {}
+        
     
     def populateComPorts(self):
         ports = serial.tools.list_ports.comports()
@@ -90,12 +93,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comSelection2.clear()
         self.comSelection3.clear()
         
+        curPort = 0
+        port_addresses = [self._defaultPortString, self._defaultPortString, self._defaultPortString]
         for port, desc, hwid in sorted(ports):
-                if len(desc) > 20:
-                    desc = f"{desc[:20]}..."
-                self.comSelection1.addItem(f"{port}: {desc}")
-                self.comSelection2.addItem(f"{port}: {desc}")
-                self.comSelection3.addItem(f"{port}: {desc}")
+            if len(desc) > 20:
+                desc = f"{desc[:20]}..."
+            if curPort < 3:
+                port_addresses[curPort] = port
+                curPort += 1
+        
+
+        self.comSelection1.addItem(f"{port_addresses[0]}: no desc") 
+        self.comSelection2.addItem(f"{port_addresses[1]}: no desc") 
+        self.comSelection3.addItem(f"{port_addresses[2]}: no desc") 
+        self.mapSerialPorts(port_addresses[0],port_addresses[1],port_addresses[2])
         self.sendMessageToDebug("COM ports populated", "INFO")
         
     def disconnectAllSerialPorts(self):
