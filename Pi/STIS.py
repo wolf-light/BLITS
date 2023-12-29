@@ -190,8 +190,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
         file_name = f"data.txt"  # Change the file name as needed
-        if(internetConnectionPresent):
-            doc_ref = db.reference('/')
+        doc_ref = db.reference('/')
 
         with open(file_name, 'a') as file:
             while self.serialChannels[buttonNumber-1].canReadLine():
