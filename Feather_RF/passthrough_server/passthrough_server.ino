@@ -159,6 +159,7 @@ void loop() {
   
   if (CONTROL_SERIAL.available() > 0) {
     String serial_message = CONTROL_SERIAL.readString();
+    serial_message = substr(0, RH_RF95_MAX_MESSAGE_LEN);
     uint8_t* serial_bytes = string_to_buf(serial_message);
     send_packet(serial_bytes, serial_message.length(), CLIENT_ADDRESS);
     delete[] serial_bytes;
