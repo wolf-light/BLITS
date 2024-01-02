@@ -307,8 +307,8 @@ void proccess_current_state() {
     case STATE::FIRE:
         print_both(fire_message);
         fireStart = millis();
-        print_both("Fire Start Time Set");
-        print_both_int(fireStart);
+        // print_both("Fire Start Time Set");
+        // print_both_int(fireStart);
         fireState = 0;
         break;
     }
@@ -330,10 +330,10 @@ void marm_to_prime() {
 }
 
 void prime_to_fire() {
-  print_both("10 SECOND ABORT");
-  delay(100);
     if (state == STATE::PRIME) {
-        int now = millis();
+        print_both("10 SECOND ABORT");
+        delay(100);
+        unsigned long now = millis();
         delay(100);
         while(millis() - now < 10000) {
             if (CONTROL_SERIAL.available() > 0) {
