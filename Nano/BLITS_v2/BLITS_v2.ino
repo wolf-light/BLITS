@@ -189,7 +189,8 @@ void test_data_reading() {
 
 String sensor_read() {
     String data("");
-    data += millis();
+    // data += millis();
+    data += relativeTime;
     data += ",";
 
     // data += ThermoCouple.readCelsius();
