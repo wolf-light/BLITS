@@ -207,7 +207,9 @@ void loop() {
     //   sensorData = recieve_response(message, 20000);
     //   Serial.print(sensorData);
     // } else {
-      recieve_response(message, 10000);
+      // if (message != "fire"){
+        recieve_response(message, 10000);
+      // }
     // }
 
     uint8_t* response = string_to_buf(message);

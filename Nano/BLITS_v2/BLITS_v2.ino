@@ -8,9 +8,11 @@
 #include "Adafruit_MCP9600.h"
 #include "HX711.h"
 
-#define I2C_ADDRESS (0x67)
+#define I2C_ADDRESS_1 (0x67)
+#define I2C_ADDRESS_2 (0x60)
 
 Adafruit_MCP9600 mcp;
+Adafruit_MCP9600 mcp2;
 
 // Pin definitions
 #define TC_DO_PIN   3
@@ -105,7 +107,7 @@ void print_system_info() {
     data += ") hurtsTime(";
     data += hurtsTime;
     data += ") ";
-    data += "Thermocouple type set to ";
+    data += "Thermocouple 1 type set to ";
     switch (mcp.getThermocoupleType()) {
       case MCP9600_TYPE_K:  data += "K"; break;
       case MCP9600_TYPE_J:  data += "J"; break;
@@ -124,6 +126,31 @@ void print_system_info() {
     data += ", ";
     data += "ADC resolution set to ";
     switch (mcp.getADCresolution()) {
+      case MCP9600_ADCRESOLUTION_18:   data += "18"; break;
+      case MCP9600_ADCRESOLUTION_16:   data += "16"; break;
+      case MCP9600_ADCRESOLUTION_14:   data += "14"; break;
+      case MCP9600_ADCRESOLUTION_12:   data += "12"; break;
+    }
+    data += " bits";
+    data += "Thermocouple 2 type set to ";
+    switch (mcp2.getThermocoupleType()) {
+      case MCP9600_TYPE_K:  data += "K"; break;
+      case MCP9600_TYPE_J:  data += "J"; break;
+      case MCP9600_TYPE_T:  data += "T"; break;
+      case MCP9600_TYPE_N:  data += "N"; break;
+      case MCP9600_TYPE_S:  data += "S"; break;
+      case MCP9600_TYPE_E:  data += "E"; break;
+      case MCP9600_TYPE_B:  data += "B"; break;
+      case MCP9600_TYPE_R:  data += "R"; break;
+    }
+    data += " type, ";
+    data += "Filter coefficient value set to: ";
+    data += mcp2.getFilterCoefficient();
+    data += ", Alert #1 temperature set to ";
+    data += mcp2.getAlertTemperature(1);
+    data += ", ";
+    data += "ADC resolution set to ";
+    switch (mcp2.getADCresolution()) {
       case MCP9600_ADCRESOLUTION_18:   data += "18"; break;
       case MCP9600_ADCRESOLUTION_16:   data += "16"; break;
       case MCP9600_ADCRESOLUTION_14:   data += "14"; break;
@@ -169,6 +196,10 @@ String sensor_read() {
     data += mcp.readThermocouple();
     data += ",";
 
+    // data += ThermoCouple.readCelsius();
+    data += mcp2.readThermocouple();
+    data += ",";
+
     data += LoadCell.get_units();
     // data += 0.00;
     data += ",";
@@ -202,6 +233,8 @@ bool serial_setup() {
 
 void setup_ematch() {
     pinMode(HURTS_PIN, OUTPUT);
+    delay(1000);
+    digitalWrite(HURTS_PIN, LOW);
     print_both(ematch_setup_mesg);
 }
 
@@ -215,8 +248,8 @@ void setup_loadcell() {
 
 void setup_thermocouple() {
     /* Initialise the driver with I2C_ADDRESS and the default I2C bus. */
-    if (! mcp.begin(I2C_ADDRESS)) {
-        print_both("Sensor not found. Check wiring!");
+    if (! mcp.begin(I2C_ADDRESS_1)) {
+        print_both("Sensor TC 1 not found. Check wiring!");
         while (1);
     }
 
@@ -231,6 +264,25 @@ void setup_thermocouple() {
   mcp.configureAlert(1, true, true);  // alert 1 enabled, rising temp
 
   mcp.enable(true);
+
+  print_both(thermocouple_setup_msg);
+
+      if (! mcp2.begin(I2C_ADDRESS_2)) {
+        print_both("Sensor not found. Check wiring!");
+        while (1);
+    }
+
+  mcp2.setADCresolution(MCP9600_ADCRESOLUTION_18);
+  
+  mcp2.setThermocoupleType(MCP9600_TYPE_K);
+
+  mcp2.setFilterCoefficient(3);
+
+  mcp2.setAlertTemperature(1, 30);
+
+  mcp2.configureAlert(1, true, true);  // alert 1 enabled, rising temp
+
+  mcp2.enable(true);
 
   print_both(thermocouple_setup_msg);
 }
@@ -278,7 +330,7 @@ void marm_to_prime() {
 }
 
 void prime_to_fire() {
-  // print_both("PrimeToFire");
+  print_both("10 SECOND ABORT");
   delay(100);
     if (state == STATE::PRIME) {
         int now = millis();
@@ -304,6 +356,7 @@ void setup() {
   serial_setup();
   setup_loadcell();
   setup_thermocouple();
+  setup_ematch();
 }
 
 void loop() {
