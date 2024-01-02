@@ -86,6 +86,7 @@ unsigned long dataOffset = 5000; // length of data collection before ignition
 unsigned long hurtsTime = 2000; // length of fire of hurts (ematch) pin
 unsigned long fireStart; // start of the fire from millis()
 unsigned long relativeTime; // time relative to fireStart
+int fireState = 0;
 
 // Calibration factors
 const int testReadings = 1000;
@@ -144,6 +145,12 @@ void print_both(String message) {
     DATA_SERIAL.println(message);
 }
 
+void print_both_int(unsigned long message) {
+    // #if DIFFERENT_SERIALS
+    CONTROL_SERIAL.println(message);
+    // #endif
+    DATA_SERIAL.println(message);
+}
 void test_data_reading() {
     int i=0;
     while (i<testReadings){
@@ -248,6 +255,9 @@ void proccess_current_state() {
     case STATE::FIRE:
         print_both(fire_message);
         fireStart = millis();
+        print_both("Fire Start Time Set");
+        print_both_int(fireStart);
+        fireState = 0;
         break;
     }
 }
@@ -268,14 +278,21 @@ void marm_to_prime() {
 }
 
 void prime_to_fire() {
+  // print_both("PrimeToFire");
+  delay(100);
     if (state == STATE::PRIME) {
         int now = millis();
-        while(millis() - now > 10000) {
+        delay(100);
+        while(millis() - now < 10000) {
             if (CONTROL_SERIAL.available() > 0) {
+                print_both("TEST ABORTED");
                 state = STATE::SAFE;
                 proccess_current_state();
                 return;
             }
+            // delay(1000);
+            // print_both("FIRE SEQUENCE");
+            // print_both_int((millis() - now));
         }
         state = STATE::FIRE;
     }
@@ -322,15 +339,23 @@ void loop() {
     case STATE::PRIME:
         break;
     case STATE::FIRE:
+      // print_both("FIRE INITIATED");
         relativeTime = millis() - fireStart;
+      // print_both("Relative Time Set");
+      // print_both_int(relativeTime);
+        // delay(1000);
         if (armState && relativeTime > dataOffset) {
+          // print_both("HURTS HIGH");
             digitalWrite(HURTS_PIN, HIGH);
+          fireState = 1;
             if (relativeTime - dataOffset > hurtsTime) {
+              // print_both("ARM STATE SET FALSE");
                 armState = false;
             }
         }
-        if (relativeTime - dataOffset > fireTime) {
+        if (fireState == 1 && (relativeTime - dataOffset > fireTime)) {
             state = STATE::SAFE;
+          print_both("END TEST");
             proccess_current_state();
         }
         sensor_read();
