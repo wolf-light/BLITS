@@ -35,6 +35,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tab1_export.clicked.connect(lambda: self.exportTerminal(1))
         self.tab2_export.clicked.connect(lambda: self.exportTerminal(2))
         self.tab3_export.clicked.connect(lambda: self.exportTerminal(3))
+        
         self.tab1_clear.clicked.connect(lambda: self.clearTerminal(1))
         self.tab2_clear.clicked.connect(lambda: self.clearTerminal(2))
         self.tab3_clear.clicked.connect(lambda: self.clearTerminal(3))
@@ -150,10 +151,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             text = text.rstrip('\r\n')
             terminals[buttonNumber-1].append(text)
             
-            #write to adjacent directory
-            #file_path = "../data/data.txt"
-            #with open(file_path, 'w') as file:
-            #    file.write(text)
+            saveDataToFile(text)
+            saveDataToFirebase(text)
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
@@ -219,6 +218,24 @@ def internetConnectionPresent(url="www.google.com", timeout=3):
         return True
     except:
         return False
+
+
+# repetitive non-throwing way to save to file 
+def saveDataToFile(data: str):
+    #TODO Implement file saving
+
+    #THIS CHUNK FROM ADAM
+    #write to adjacent directory
+    #file_path = "../data/data.txt"
+    #with open(file_path, 'w') as file:
+    #    file.write(data)
+
+    return
+
+# repetivitve non-throwing way to write to firebase
+def saveDataToFirebase(data: str):
+    #TODO Implement firebase functionality
+    return
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
