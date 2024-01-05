@@ -150,6 +150,32 @@ bool recieve_response(String& message, const unsigned long& waitMillis) {
   }
 }
 
+void proccess_current_state() {
+    switch (state) 
+    {
+    case STATE::SAFE:
+        digitalWrite(HURTS_PIN, LOW);
+        print_both(safe_message);
+        armState = false;
+        break;
+    case STATE::MARM:
+        print_both(marm_message);
+        armState = false;
+        break;
+    case STATE::PRIME:
+        print_both(prime_message);
+        armState = true;
+        break;
+    case STATE::FIRE:
+        print_both(fire_message);
+        fireStart = millis();
+        // print_both("Fire Start Time Set");
+        // print_both_int(fireStart);
+        fireState = 0;
+        break;
+    }
+}
+
 void setup() {
   setup_debug_serial();
   setup_control_serial();
@@ -162,7 +188,7 @@ int buttonstate = digitalRead(MARM_SW);
   if (buttonstate == HIGH) {
     // Serial.println("MARM_SW ARMED");
     if (armState == 0) {
-    uint8_t* response = string_to_buf("MARM_SW ARMED");
+    uint8_t* response = string_to_buf("MARM_SW ARMED: ");
     uint8_t length = 13;
     send_packet(response, length, CLIENT_ADDRESS);
     }
@@ -196,8 +222,8 @@ void loop() {
       DEBUG_SERIAL.println(message);
       CONTROL_SERIAL.print(message);  // may have to change to println if that's what control system expects
     } else if ((message == "fire" || message == "yes" || message == "start") && armState == 0) {
-      uint8_t* response = string_to_buf("NEGATIVE MARM");
-      uint8_t length = 13;
+      uint8_t* response = string_to_buf("NEGATIVE MARM: ");
+      uint8_t length = 15;
       send_packet(response, length, CLIENT_ADDRESS);
     } else {
       CONTROL_SERIAL.print(message);
