@@ -63,6 +63,7 @@ const char* serial_setup_msg = "serial setup complete";
 const char* loadcell_setup_msg = "loadcell setup complete";
 const char* thermocouple_setup_msg = "tc setup complete";
 const char* ematch_setup_mesg = "ematch setup complete";
+const char* zero_sensors_message = "sensors zeroed";
 
 // KEEP IN ACENDING ORDER OF DANGER
 enum class STATE {
@@ -303,6 +304,10 @@ void setup_loadcell() {
   print_both(loadcell_setup_msg);
 }
 
+void zero_loadcell() {
+  LoadCell.tare();
+}
+
 void setup_thermocouple() {
   /* Initialise the driver with I2C_ADDRESS and the default I2C bus. */
   if (!mcp.begin(I2C_ADDRESS_1)) {
@@ -313,7 +318,7 @@ void setup_thermocouple() {
 
   mcp.setADCresolution(MCP9600_ADCRESOLUTION_18);
 
-  mcp.setThermocoupleType(MCP9600_TYPE_K);
+  mcp.setThermocoupleType(MCP9600_TYPE_J);
 
   mcp.setFilterCoefficient(3);
 
@@ -333,7 +338,7 @@ void setup_thermocouple() {
 
   mcp2.setADCresolution(MCP9600_ADCRESOLUTION_18);
 
-  mcp2.setThermocoupleType(MCP9600_TYPE_K);
+  mcp2.setThermocoupleType(MCP9600_TYPE_J);
 
   mcp2.setFilterCoefficient(3);
 
@@ -344,6 +349,11 @@ void setup_thermocouple() {
   mcp2.enable(true);
 
   print_both(thermocouple_setup_msg);
+}
+
+void zero_sensors() {
+  zero_loadcell();
+  print_both(zero_sensors_message);
 }
 
 //---------ON STATE TRANSITION------------------------//
@@ -403,6 +413,8 @@ void prime_to_fire() {
       // delay(1000);
       // print_both("FIRE SEQUENCE");
       // print_both_int((millis() - now));
+      relativeTime = 10000 - (millis() - now);
+      sensor_read();
     }
     state = STATE::FIRE;
   }
@@ -430,11 +442,14 @@ void loop() {
     } else if (command == "start") {
       safe_to_marm();
     } else if (command == "yes") {
+      zero_sensors();   //Do we want this here? Or elsewhere?
       marm_to_prime();
     } else if (command == "fire") {
       prime_to_fire();
     } else if (command == "calibrate") {
       set_calibration_factors();
+    } else if (command == "zero sensors") {
+      zero_sensors();
     } else {
       Serial1.print("Invalid Command: ");
       Serial1.println(command);
@@ -460,6 +475,7 @@ void loop() {
         fireState = 1;
         if (relativeTime - dataOffset > hurtsTime) {
           // print_both("ARM STATE SET FALSE");
+          digitalWrite(HURTS_PIN, LOW);
           armState = false;
         }
       }
