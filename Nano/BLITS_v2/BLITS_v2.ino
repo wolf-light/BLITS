@@ -84,7 +84,6 @@ unsigned long dataOffset = 5000;  // length of data collection before ignition
 unsigned long hurtsTime = 2000;   // length of fire of hurts (ematch) pin
 unsigned long fireStart;          // start of the fire from millis()
 unsigned long relativeTime;       // time relative to fireStart
-int fireState = 0;
 
 // Calibration factors
 const int testReadings = 6;
@@ -126,9 +125,9 @@ void set_calibration_factors() {
 
     if (DATA_SERIAL.available()) {
       char temp = DATA_SERIAL.read();
-      if (temp == '+' || temp == 'a') {
+      if ('+' == temp || 'a' == temp) {
         LC_calibration_factor += 10;
-      } else if (temp == '-' || temp == 'z') {
+      } else if ('-' == temp|| 'z' == temp) {
         LC_calibration_factor -= 10;
       }
     }
@@ -191,13 +190,6 @@ String thermocouple_info(const Adafruit_MCP9600* const thermocouple, char num) {
  * Dependent on the if there are two serial connections or just one
 */
 void print_both(String message) {
-  #ifdef DIFFERENT_SERIALS
-  CONTROL_SERIAL.println(message);
-  #endif
-  DATA_SERIAL.println(message);
-}
-
-void print_both_int(unsigned long message) {
   #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.println(message);
   #endif
@@ -313,21 +305,21 @@ void proccess_current_state() {
 
 //---------STATE CHANGE FUNCTIONS------------------------//
 void safe_to_marm() {
-  if (state == STATE::SAFE) {
+  if (STATE::SAFE == state) {
     state = STATE::MARM;
   }
   proccess_current_state();
 }
 
 void marm_to_prime() {
-  if (state == STATE::MARM) {
+  if (STATE::MARM == state) {
     state = STATE::PRIME;
   }
   proccess_current_state();
 }
 
 void prime_to_fire() {
-  if (state == STATE::PRIME) {
+  if (STATE::PRIME == state) {
     print_both("10 SECOND ABORT");
     delay(100);
     unsigned long now = millis();
@@ -362,23 +354,23 @@ void setup() {
 void loop() {
   if (CONTROL_SERIAL.available() > 0) {
     command = CONTROL_SERIAL.readString();
-    if (command == "read data") {
+    if ("read data" == command) {
       test_data_reading();
-    } else if (command == "info") {
+    } else if ("info" == command) {
       print_system_info();
-    } else if (command == "safe") {
+    } else if ("safe" == command) {
       state = STATE::SAFE;
       proccess_current_state();
-    } else if (command == "start") {
+    } else if ("start" == command) {
       safe_to_marm();
-    } else if (command == "yes") {
+    } else if ("yes" == command) {
       zero_sensors();   //Do we want this here? Or elsewhere?
       marm_to_prime();
-    } else if (command == "fire") {
+    } else if ("fire" == command) {
       prime_to_fire();
-    } else if (command == "calibrate") {
+    } else if ("calibrate" == command) {
       set_calibration_factors();
-    } else if (command == "zero sensors") {
+    } else if ("zero sensors" == command) {
       zero_sensors();
     } else {
       print_both("Invalid Command: ");
@@ -394,22 +386,15 @@ void loop() {
     case STATE::PRIME:
       break;
     case STATE::FIRE:
-      // print_both("FIRE INITIATED");
       relativeTime = millis() - fireStart;
-      // print_both("Relative Time Set");
-      // print_both_int(relativeTime);
-      // delay(1000);
       if (armState && relativeTime > dataOffset) {
-        // print_both("HURTS HIGH");
         digitalWrite(HURTS_PIN, HIGH);
-        fireState = 1;
         if (relativeTime - dataOffset > hurtsTime) {
-          // print_both("ARM STATE SET FALSE");
           digitalWrite(HURTS_PIN, LOW);
           armState = false;
         }
       }
-      if (fireState == 1 && (relativeTime - dataOffset > fireTime)) {
+      if (relativeTime - dataOffset > fireTime) {
         state = STATE::SAFE;
         print_both("END TEST");
         proccess_current_state();
