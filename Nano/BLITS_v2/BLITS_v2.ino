@@ -8,22 +8,12 @@
 #include "Adafruit_MCP9600.h"
 #include "HX711.h"
 
+// Pin definitions
 #define I2C_ADDRESS_1 (0x67)
 #define I2C_ADDRESS_2 (0x60)
 
-Adafruit_MCP9600 mcp;
-Adafruit_MCP9600 mcp2;
-
-// Pin definitions
-#define TC_DO_PIN 3
-#define TC_CS_PIN 4
-#define TC_CLK_PIN 5
-
 #define LC_DAT_PIN 6
 #define LC_CLK_PIN 7
-
-// #define LC_calibration_factor -1750.0
-int LC_calibration_factor = -1750.0;
 
 #define PS1_PIN A7
 #define PS2_PIN A6
@@ -38,6 +28,9 @@ int LC_calibration_factor = -1750.0;
 
 #define CONTROL_SERIAL Serial1
 #define CONTROL_BAUDRATE 115200
+
+const auto TC_1_TYPE = MCP9600_TYPE_J;
+const auto TC_2_TYPE = MCP9600_TYPE_J;
 
 /**
  * If using softwareSerial use Serial1 for control serial
@@ -75,8 +68,9 @@ enum class STATE {
 
 // Object declarations
 SoftwareSerial Serial1(Software_RX, Software_TX);
-// Adafruit_MAX31855 ThermoCouple(TC_CLK_PIN, TC_CS_PIN, TC_DO_PIN);
 HX711 LoadCell;
+Adafruit_MCP9600 tc_1;
+Adafruit_MCP9600 tc_2;
 
 // Universal Variables
 STATE state = STATE::SAFE;
@@ -94,6 +88,8 @@ int fireState = 0;
 
 // Calibration factors
 const int testReadings = 6;
+int LC_calibration_factor = -1750.0;
+
 
 void set_calibration_factors() {
   print_both("Enter Calibration Factors. Load Cell first. Next to skip, end to stop.");
@@ -113,18 +109,12 @@ void set_calibration_factors() {
   DATA_SERIAL.print("Zero factor: ");          //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
   DATA_SERIAL.println(zero_factor);
 
-LOAD_CELL_START:
-  String command2;
+
+  String input;
   if (DATA_SERIAL.available() > 0) {
-    command2 = DATA_SERIAL.readString();
+    input = DATA_SERIAL.readString();
   }
-  if (command2 == "next") {
-    goto TC_START;
-  } else if (command2 == "end") {
-    goto END;
-  } else if (command2 != '+' && command2 != 'a' && command2 != '-' && command2 != 'z') {
-    goto TC_START;
-  } else{
+  while (input == '+' || input == 'a' || input == '-' || input == 'z') {
     LoadCell.set_scale(LC_calibration_factor);  //Adjust to this calibration factor
 
     DATA_SERIAL.print("Reading: ");
@@ -134,7 +124,7 @@ LOAD_CELL_START:
     DATA_SERIAL.print(LC_calibration_factor);
     DATA_SERIAL.println();
 
-    if (Serial.available()) {
+    if (DATA_SERIAL.available()) {
       char temp = DATA_SERIAL.read();
       if (temp == '+' || temp == 'a') {
         LC_calibration_factor += 10;
@@ -143,79 +133,57 @@ LOAD_CELL_START:
       }
     }
   }
-  goto LOAD_CELL_START;
-TC_START:
-END:
-print_both("Calibration Complete");
+  print_both("Calibration Complete");
 }
 
 void print_system_info() {
   print_both("System Info Incoming: ");
-  String data = "Calibration Factors: ";
-  // Put calibration factors here
-  data += " TIMES: fireTime(";
-  data += fireTime;
-  data += "), dataOffset(";
-  data += dataOffset;
-  data += ") hurtsTime(";
-  data += hurtsTime;
-  data += ") ";
-  delay(500);
-  print_both(data);
-  data += "Thermocouple 1 type set to ";
-  switch (mcp.getThermocoupleType()) {
-    case MCP9600_TYPE_K: data += "K"; break;
-    case MCP9600_TYPE_J: data += "J"; break;
-    case MCP9600_TYPE_T: data += "T"; break;
-    case MCP9600_TYPE_N: data += "N"; break;
-    case MCP9600_TYPE_S: data += "S"; break;
-    case MCP9600_TYPE_E: data += "E"; break;
-    case MCP9600_TYPE_B: data += "B"; break;
-    case MCP9600_TYPE_R: data += "R"; break;
+  String info = "Calibration Factors: ";
+
+  info += " TIMES: fireTime(";
+  info += fireTime;
+  info += "), dataOffset(";
+  info += dataOffset;
+  info += ") hurtsTime(";
+  info += hurtsTime;
+  info += ") \n";
+
+  print_both(info);
+  print_both(thermocouple_info(&tc_1, '1'));
+  print_both(thermocouple_info(&tc_2, '2'));
+}
+
+char thermocouple_type(const Adafruit_MCP9600* const thermocouple) {
+  switch (thermocouple->getThermocoupleType()) {
+    case MCP9600_TYPE_K: return 'K';
+    case MCP9600_TYPE_J: return 'J'; 
+    case MCP9600_TYPE_T: return 'T';
+    case MCP9600_TYPE_N: return 'N';
+    case MCP9600_TYPE_S: return 'S'; 
+    case MCP9600_TYPE_E: return 'E'; 
+    case MCP9600_TYPE_B: return 'B'; 
+    case MCP9600_TYPE_R: return 'R';
+    default: return 'U';
   }
-  data += " type, ";
-  data += "Filter coefficient value set to: ";
-  data += mcp.getFilterCoefficient();
-  data += ", Alert #1 temperature set to ";
-  data += mcp.getAlertTemperature(1);
-  data += ", ";
-  data += "ADC resolution set to ";
-  switch (mcp.getADCresolution()) {
-    case MCP9600_ADCRESOLUTION_18: data += "18"; break;
-    case MCP9600_ADCRESOLUTION_16: data += "16"; break;
-    case MCP9600_ADCRESOLUTION_14: data += "14"; break;
-    case MCP9600_ADCRESOLUTION_12: data += "12"; break;
+}
+
+int thermocouple_address_resolution(const Adafruit_MCP9600* const thermocouple) {
+  switch (thermocouple->getADCresolution()) {
+    case MCP9600_ADCRESOLUTION_18: return 18;
+    case MCP9600_ADCRESOLUTION_16: return 16;
+    case MCP9600_ADCRESOLUTION_14: return 14;
+    case MCP9600_ADCRESOLUTION_12: return 12;
+    default: return -1;
   }
-  data += " bits";
-  delay(500);
-  print_both(data);
-  data += "Thermocouple 2 type set to ";
-  switch (mcp2.getThermocoupleType()) {
-    case MCP9600_TYPE_K: data += "K"; break;
-    case MCP9600_TYPE_J: data += "J"; break;
-    case MCP9600_TYPE_T: data += "T"; break;
-    case MCP9600_TYPE_N: data += "N"; break;
-    case MCP9600_TYPE_S: data += "S"; break;
-    case MCP9600_TYPE_E: data += "E"; break;
-    case MCP9600_TYPE_B: data += "B"; break;
-    case MCP9600_TYPE_R: data += "R"; break;
-  }
-  data += " type, ";
-  data += "Filter coefficient value set to: ";
-  data += mcp2.getFilterCoefficient();
-  data += ", Alert #1 temperature set to ";
-  data += mcp2.getAlertTemperature(1);
-  data += ", ";
-  data += "ADC resolution set to ";
-  switch (mcp2.getADCresolution()) {
-    case MCP9600_ADCRESOLUTION_18: data += "18"; break;
-    case MCP9600_ADCRESOLUTION_16: data += "16"; break;
-    case MCP9600_ADCRESOLUTION_14: data += "14"; break;
-    case MCP9600_ADCRESOLUTION_12: data += "12"; break;
-  }
-  data += " bits";
-  delay(1000);
-  print_both(data);
+}
+
+String thermocouple_info(const Adafruit_MCP9600* const thermocouple, char num) {
+  String info = "";
+  info += "Thermocouple " + String(num) + " type set to " + String(thermocouple_type(thermocouple)) + " type, ";
+  info += "Filter coefficient value set to: " + String(thermocouple->getFilterCoefficient());
+  info += ", Alert #1 temperature set to " + String(thermocouple->getAlertTemperature(1));
+  info += ", ADC resolution set to " + String(thermocouple_address_resolution(thermocouple)) + " bits";
+  return info;
 }
 
 /**
@@ -223,18 +191,19 @@ void print_system_info() {
  * Dependent on the if there are two serial connections or just one
 */
 void print_both(String message) {
-  // #if DIFFERENT_SERIALS
+  #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.println(message);
-  // #endif
+  #endif
   DATA_SERIAL.println(message);
 }
 
 void print_both_int(unsigned long message) {
-  // #if DIFFERENT_SERIALS
+  #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.println(message);
-  // #endif
+  #endif
   DATA_SERIAL.println(message);
 }
+
 void test_data_reading() {
   int i = 0;
   while (i < testReadings) {
@@ -246,32 +215,16 @@ void test_data_reading() {
 
 String sensor_read() {
   String data("");
-  // data += millis();
   data += relativeTime;
   data += ",";
 
-  // data += ThermoCouple.readCelsius();
-  data += mcp.readThermocouple();
+  data += tc_1.readThermocouple();
   data += ",";
 
-  // data += ThermoCouple.readCelsius();
-  data += mcp2.readThermocouple();
+  data += tc_2.readThermocouple();
   data += ",";
 
   data += LoadCell.get_units();
-  // data += 0.00;
-  data += ",";
-
-  // data += analogRead(PS1_PIN);
-  data += 0.00;
-  data += ",";
-
-  // data = analogRead(PS2_PIN);
-  data += 0.00;
-  // data += ",";
-
-  // data += analogRead(PS3_PIN);
-  // data += 0.00;
 
   DATA_SERIAL.println(data);
   return data;
@@ -280,9 +233,9 @@ String sensor_read() {
 //---------SETUP FUNCTIONS------------------------//
 bool serial_setup() {
   DATA_SERIAL.begin(DATA_BAUDRATE);
-#ifdef DIFFERENT_SERIALS
+  #ifdef DIFFERENT_SERIALS
   CONTROL_SERIAL.begin(CONTROL_BAUDRATE);
-#endif
+  #endif
   while (!DATA_SERIAL || !CONTROL_SERIAL) {
     ;  // wait for serial connections to finish
   }
@@ -308,45 +261,24 @@ void zero_loadcell() {
   LoadCell.tare();
 }
 
-void setup_thermocouple() {
+void setup_thermocouple(Adafruit_MCP9600* thermocouple, int address, _themotype type) {
   /* Initialise the driver with I2C_ADDRESS and the default I2C bus. */
-  if (!mcp.begin(I2C_ADDRESS_1)) {
+  if (!thermocouple->begin(address)) {
     print_both("Sensor TC 1 not found. Check wiring!");
-    while (1)
-      ;
+    exit;
   }
 
-  mcp.setADCresolution(MCP9600_ADCRESOLUTION_18);
+  thermocouple->setADCresolution(MCP9600_ADCRESOLUTION_18);
 
-  mcp.setThermocoupleType(MCP9600_TYPE_J);
+  thermocouple->setThermocoupleType(type);
 
-  mcp.setFilterCoefficient(3);
+  thermocouple->setFilterCoefficient(3);
 
-  mcp.setAlertTemperature(1, 30);
+  thermocouple->setAlertTemperature(1, 30);
 
-  mcp.configureAlert(1, true, true);  // alert 1 enabled, rising temp
+  thermocouple->configureAlert(1, true, true);  // alert 1 enabled, rising temp
 
-  mcp.enable(true);
-
-  print_both(thermocouple_setup_msg);
-
-  if (!mcp2.begin(I2C_ADDRESS_2)) {
-    print_both("Sensor TC 2 not found. Check wiring!");
-    while (1)
-      ;
-  }
-
-  mcp2.setADCresolution(MCP9600_ADCRESOLUTION_18);
-
-  mcp2.setThermocoupleType(MCP9600_TYPE_J);
-
-  mcp2.setFilterCoefficient(3);
-
-  mcp2.setAlertTemperature(1, 30);
-
-  mcp2.configureAlert(1, true, true);  // alert 1 enabled, rising temp
-
-  mcp2.enable(true);
+  thermocouple->enable(true);
 
   print_both(thermocouple_setup_msg);
 }
@@ -375,9 +307,6 @@ void proccess_current_state() {
     case STATE::FIRE:
       print_both(fire_message);
       fireStart = millis();
-      // print_both("Fire Start Time Set");
-      // print_both_int(fireStart);
-      fireState = 0;
       break;
   }
 }
@@ -425,7 +354,8 @@ void prime_to_fire() {
 void setup() {
   serial_setup();
   setup_loadcell();
-  setup_thermocouple();
+  setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
+  setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
   setup_ematch();
 }
 
@@ -451,8 +381,8 @@ void loop() {
     } else if (command == "zero sensors") {
       zero_sensors();
     } else {
-      Serial1.print("Invalid Command: ");
-      Serial1.println(command);
+      print_both("Invalid Command: ");
+      print_both(command);
     }
   }
 
