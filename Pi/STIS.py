@@ -186,10 +186,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
-        file_name = f"data.txt"  # Change the file name as needed
+        #file_name = f"data.txt"  # Change the file name as needed
         doc_ref = db.reference('/')
 
-        with open(file_name, 'a') as file:
+        with open("data.txt", 'a') as file:
             while self.serialChannels[buttonNumber-1].canReadLine():
                 text = self.serialChannels[buttonNumber-1].readLine()
                 text = text.data().decode()
