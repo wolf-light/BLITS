@@ -36,9 +36,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #print("Initializing")
         # Initialize Firebase Admin SDK
         try:
-            cred = credentials.Certificate(r"./realtimetest-11796-firebase-adminsdk-tbluh-04f6034e20.json")  # Replace with your service account JSON file path
+            cred = credentials.Certificate(r"./bulldog-rocketry-a06cc-firebase-adminsdk-7hs4e-4c786d56ca.json")  # Replace with your service account JSON file path
             firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://realtimetest-11796-default-rtdb.firebaseio.com/'
+            'databaseURL': 'https://bulldog-rocketry-a06cc-default-rtdb.firebaseio.com/testdata'
             })
             
             print("connected to firebase")
