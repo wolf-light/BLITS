@@ -20,6 +20,15 @@
 #define MARM_SW 13
 int armState = 0;
 
+enum STATE {
+  SAFE,
+  MARM,
+  PRIME,
+  FIRE
+};
+
+STATE state = SAFE;
+
 //Class objects
 RH_RF95 driver(RFM95_CS, RFM95_INT);
 RHReliableDatagram manager(driver, SERVER_ADDRESS);
@@ -30,9 +39,9 @@ bool responseSuccessful = false;
 
 bool setup_debug_serial() {
   DEBUG_SERIAL.begin(DEBUG_BAUDRATE);
-  while (!DEBUG_SERIAL) {
-    ;
-  }
+  // while (!DEBUG_SERIAL) {
+  //   ;
+  // }
   DEBUG_SERIAL.println("debug serial initialized");
   return true;
 }
@@ -148,32 +157,6 @@ bool recieve_response(String& message, const unsigned long& waitMillis) {
     message = "no response recieved";
     return false;
   }
-}
-
-void proccess_current_state() {
-    switch (state) 
-    {
-    case STATE::SAFE:
-        digitalWrite(HURTS_PIN, LOW);
-        print_both(safe_message);
-        armState = false;
-        break;
-    case STATE::MARM:
-        print_both(marm_message);
-        armState = false;
-        break;
-    case STATE::PRIME:
-        print_both(prime_message);
-        armState = true;
-        break;
-    case STATE::FIRE:
-        print_both(fire_message);
-        fireStart = millis();
-        // print_both("Fire Start Time Set");
-        // print_both_int(fireStart);
-        fireState = 0;
-        break;
-    }
 }
 
 void setup() {

@@ -84,6 +84,7 @@ unsigned long dataOffset = 5000;  // length of data collection before ignition
 unsigned long hurtsTime = 2000;   // length of fire of hurts (ematch) pin
 unsigned long fireStart;          // start of the fire from millis()
 unsigned long relativeTime;       // time relative to fireStart
+int fireState = 0;
 
 // Calibration factors
 const int testReadings = 6;
@@ -217,6 +218,14 @@ String sensor_read() {
   data += ",";
 
   data += LoadCell.get_units();
+  data += ",";
+
+  float p = analogRead(PS1_PIN);
+  data += p;
+  data += ",";
+
+  p = analogRead(PS2_PIN);
+  data += p;
 
   DATA_SERIAL.println(data);
   return data;
@@ -299,6 +308,7 @@ void proccess_current_state() {
     case STATE::FIRE:
       print_both(fire_message);
       fireStart = millis();
+      fireState = 0;
       break;
   }
 }
@@ -334,7 +344,7 @@ void prime_to_fire() {
       // delay(1000);
       // print_both("FIRE SEQUENCE");
       // print_both_int((millis() - now));
-      relativeTime = 10000 - (millis() - now);
+      relativeTime = (10000 - (millis() - now));
       sensor_read();
     }
     state = STATE::FIRE;
@@ -354,23 +364,23 @@ void setup() {
 void loop() {
   if (CONTROL_SERIAL.available() > 0) {
     command = CONTROL_SERIAL.readString();
-    if ("read data" == command) {
+    if (command == "read data") {
       test_data_reading();
-    } else if ("info" == command) {
+    } else if (command == "info") {
       print_system_info();
-    } else if ("safe" == command) {
+    } else if (command == "safe") {
       state = STATE::SAFE;
       proccess_current_state();
-    } else if ("start" == command) {
+    } else if (command == "start") {
       safe_to_marm();
-    } else if ("yes" == command) {
+    } else if (command == "yes") {
       zero_sensors();   //Do we want this here? Or elsewhere?
       marm_to_prime();
-    } else if ("fire" == command) {
+    } else if (command == "fire") {
       prime_to_fire();
-    } else if ("calibrate" == command) {
+    } else if (command == "calibrate") {
       set_calibration_factors();
-    } else if ("zero sensors" == command) {
+    } else if (command == "zero sensors") {
       zero_sensors();
     } else {
       print_both("Invalid Command: ");
@@ -386,15 +396,22 @@ void loop() {
     case STATE::PRIME:
       break;
     case STATE::FIRE:
+      // print_both("FIRE INITIATED");
       relativeTime = millis() - fireStart;
+      // print_both("Relative Time Set");
+      // print_both_int(relativeTime);
+      // delay(1000);
       if (armState && relativeTime > dataOffset) {
+        // print_both("HURTS HIGH");
         digitalWrite(HURTS_PIN, HIGH);
+        fireState = 1;
         if (relativeTime - dataOffset > hurtsTime) {
+          // print_both("ARM STATE SET FALSE");
           digitalWrite(HURTS_PIN, LOW);
           armState = false;
         }
       }
-      if (relativeTime - dataOffset > fireTime) {
+      if (fireState == 1 && (relativeTime - dataOffset > fireTime)) {
         state = STATE::SAFE;
         print_both("END TEST");
         proccess_current_state();
