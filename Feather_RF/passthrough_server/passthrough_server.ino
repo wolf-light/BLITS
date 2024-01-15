@@ -14,11 +14,10 @@
 #define CONTROL_BAUDRATE 115200
 #define CONTROL_RESPONSE_DELAY 1000
 
-#define DEBUG_SERIAL Serial
+// #define DEBUG_SERIAL Serial
 #define DEBUG_BAUDRATE 115200
 
 #define MARM_SW 13
-int armState = 0;
 
 enum STATE {
   SAFE,
@@ -27,8 +26,6 @@ enum STATE {
   FIRE
 };
 
-STATE state = SAFE;
-
 //Class objects
 RH_RF95 driver(RFM95_CS, RFM95_INT);
 RHReliableDatagram manager(driver, SERVER_ADDRESS);
@@ -36,13 +33,23 @@ RHReliableDatagram manager(driver, SERVER_ADDRESS);
 uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 uint8_t len = sizeof(buf);
 bool responseSuccessful = false;
+STATE state = SAFE;
+int armState = 0;
+
+void debug_print(String message) {
+  #ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.println(message);
+  #endif
+}
 
 bool setup_debug_serial() {
   DEBUG_SERIAL.begin(DEBUG_BAUDRATE);
-  // while (!DEBUG_SERIAL) {
-  //   ;
-  // }
+  #ifdef DEBUG_SERIAL
+  while (!DEBUG_SERIAL) {
+    ;
+  }
   DEBUG_SERIAL.println("debug serial initialized");
+  #endif
   return true;
 }
 
@@ -51,7 +58,7 @@ bool setup_control_serial() {
   while (!CONTROL_SERIAL) {
     ;
   }
-  DEBUG_SERIAL.println("control serial initialized");
+  debug_print("control serial initialized");
   return true;
 }
 
@@ -60,11 +67,11 @@ bool radio_setup() {
   digitalWrite(RFM95_RST, HIGH);
 
   if (!manager.init()) {
-    DEBUG_SERIAL.println("manager init failed");
+    debug_print("manager init failed");
   }
 
   while (!driver.setFrequency(RF95_FREQ)) {
-    DEBUG_SERIAL.println("freq set failed");
+    debug_print("freq set failed");
     delay(5);
   }
 
@@ -72,7 +79,7 @@ bool radio_setup() {
 
   driver.setTxPower(23, false);
 
-  DEBUG_SERIAL.println("radio initialized");
+  debug_print("radio initialized");
 
   delay(1000);
   return true;
@@ -93,25 +100,27 @@ String byte_to_string(uint8_t const byte_arr[], const int& arr_len) {
 }
 
 void print_string_dst_len(const String& string, const int& address, const int& len) {
+  #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.print(string);
   DEBUG_SERIAL.print(" 0x");
   DEBUG_SERIAL.print(address, HEX);
   DEBUG_SERIAL.print(" (");
   DEBUG_SERIAL.print(len);
   DEBUG_SERIAL.print("): ");
+  #endif
 }
 
 bool send_packet(uint8_t data[], int data_length, int dst_address) {
-  DEBUG_SERIAL.println();
+  debug_print("");
   print_string_dst_len("sending message to", dst_address, data_length);
   print_byte(data, data_length);
-  DEBUG_SERIAL.println();
+  debug_print("");
 
   if (manager.sendtoWait(data, data_length, dst_address)) {
-    DEBUG_SERIAL.println("transmission successful");
+    debug_print("transmission successful");
     return true;
   } else {
-    DEBUG_SERIAL.println("transmission failed");
+    debug_print("transmission failed");
     return false;
   }
 }
@@ -127,7 +136,7 @@ int recieve_packet(bool& message_recieved, int timeout) {
       message_recieved = true;
       return len;
     } else {
-      DEBUG_SERIAL.println("No reply, is rf95_reliable_datagram_server running?");
+      debug_print("No reply, is rf95_reliable_datagram_server running?");
       return -1;
     }
   } else {
@@ -201,8 +210,7 @@ void loop() {
     String message = byte_to_string(buf, len);
     checkMARM();
     if ((message == "fire" || message == "yes" || message == "start") && armState == 1) {
-      DEBUG_SERIAL.print("Message forwarded: ");
-      DEBUG_SERIAL.println(message);
+      debug_print("Message forwarded: " + message);
       CONTROL_SERIAL.print(message);  // may have to change to println if that's what control system expects
     } else if ((message == "fire" || message == "yes" || message == "start") && armState == 0) {
       uint8_t* response = string_to_buf("NEGATIVE MARM: ");
