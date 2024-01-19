@@ -80,7 +80,7 @@ unsigned long readTime;
 
 // Times used in FIRE state of loop()
 unsigned long fireTime = 180000;  // length of data collection after ignition
-unsigned long dataOffset = 5000;  // length of data collection before ignition
+unsigned long dataOffset = 0;  // length of data collection before ignition
 unsigned long hurtsTime = 2000;   // length of fire of hurts (ematch) pin
 unsigned long fireStart;          // start of the fire from millis()
 unsigned long relativeTime;       // time relative to fireStart
@@ -130,6 +130,8 @@ void set_calibration_factors() {
         LC_calibration_factor += 10;
       } else if ('-' == temp|| 'z' == temp) {
         LC_calibration_factor -= 10;
+      } else {
+        break;
       }
     }
   }
@@ -344,7 +346,8 @@ void prime_to_fire() {
       // delay(1000);
       // print_both("FIRE SEQUENCE");
       // print_both_int((millis() - now));
-      relativeTime = (10000 - (millis() - now));
+      // relativeTime = (10000 - (millis() - now));
+      relativeTime = 0;    //If we do a proper countdown, it messes up the formatting of our data in the cloud... maybe.
       sensor_read();
     }
     state = STATE::FIRE;

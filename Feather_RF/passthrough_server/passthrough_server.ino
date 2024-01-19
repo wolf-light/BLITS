@@ -14,7 +14,7 @@
 #define CONTROL_BAUDRATE 115200
 #define CONTROL_RESPONSE_DELAY 1000
 
-// #define DEBUG_SERIAL Serial
+#define DEBUG_SERIAL Serial
 #define DEBUG_BAUDRATE 115200
 
 #define MARM_SW 13
@@ -219,15 +219,15 @@ void loop() {
     } else {
       CONTROL_SERIAL.print(message);
     }
-    // if (message == "read data") {
-    //   String sensorData;
-    //   sensorData = recieve_response(message, 20000);
-    //   Serial.print(sensorData);
-    // } else {
-      // if (message != "fire"){
+    if (message == "read data") {
+      String sensorData;
+      sensorData = recieve_response(message, 20000);
+      Serial.print(sensorData);
+    } else {
+      if (message != "fire"){
         recieve_response(message, 10000);
-      // }
-    // }
+      }
+    }
 
     uint8_t* response = string_to_buf(message);
     uint8_t length = message.length();
