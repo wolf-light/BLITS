@@ -16,6 +16,7 @@ from MainWindow import Ui_MainWindow
 
 import serial.tools.list_ports
 import serial
+import _asyncio
 
 import http.client as httplib
 
@@ -182,12 +183,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             except:
                 print("failed to live write to file")
     '''
-    
+
+        
     @pyqtSlot()
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
         #file_name = f"data.txt"  # Change the file name as needed
-        doc_ref = db.reference('/')
+        #doc_ref = db.reference('/')
+        async def upload_to_firebase(data):
+            ref = db.reference('STISTest')
+            await ref.push().set(data)
 
         with open("data.txt", 'a') as file:
             while self.serialChannels[buttonNumber-1].canReadLine():
@@ -202,7 +207,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 file.write(text + '\n')
                 file.flush()  # Ensure data is written immediately
                 #changed tests here
-                doc_ref.child('STIStest').push(text)
+                
+                
+                _asyncio.run(upload_to_firebase(text))
+                #doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
             
