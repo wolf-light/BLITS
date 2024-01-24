@@ -16,7 +16,7 @@ from MainWindow import Ui_MainWindow
 
 import serial.tools.list_ports
 import serial
-import _asyncio
+import asyncio
 
 import http.client as httplib
 
@@ -209,10 +209,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 #changed tests here
                 
                 
-                _asyncio.run(upload_to_firebase(text))
+                task = asyncio.create_task(upload_to_firebase(text))
                 #doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
+                
+                return task
             
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
