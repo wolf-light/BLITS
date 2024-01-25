@@ -8,7 +8,7 @@ test test test
 
 import sys
 from PyQt5 import QtCore, QtWidgets, uic, QtSerialPort
-from PyQt5.QtCore import QRunnable, pyqtSlot
+from PyQt5.QtCore import QRunnable, pyqtSlot, QEventLoop
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -189,10 +189,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def receive(self, buttonNumber):
         terminals = [self.terminalOutput, self.terminalOutput2, self.terminalOutput3]
         #file_name = f"data.txt"  # Change the file name as needed
-        #doc_ref = db.reference('/')
-        async def upload_to_firebase(data):
-            ref = db.reference('STISTest')
-            await ref.push().set(data)
+        doc_ref = db.reference('/')
+        
 
         with open("data.txt", 'a') as file:
             while self.serialChannels[buttonNumber-1].canReadLine():
@@ -209,13 +207,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 #changed tests here
                 
                 
-                task = asyncio.create_task(upload_to_firebase(text))
-                #doc_ref.child('STIStest').push(text)
+                
+                asyncio.ensure_future(self.push_to_firebase(text))
                 # Optionally, you can print the received data
                 #print(text)
                 
-                return task
-            
+                
+    async def push_to_firebase(self, text):
+        doc_ref = db.reference('/')
+        try:
+            doc_ref.child('STIStest').push(text)
+        except Exception as e:
+            print(f"not pushed to firebase: {e}")
+                
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
         currentTime = now.strftime("%H:%M:%S")
