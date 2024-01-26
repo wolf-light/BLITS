@@ -117,5 +117,5 @@ def test_dbfuncs():
     dbfunctions.stop()
 
 if __name__ == "__main__":
-    test_dbfuncs()
-    #main()
+    #test_dbfuncs()
+    main()
