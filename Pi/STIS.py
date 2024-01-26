@@ -208,17 +208,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 
                 
                 
-                asyncio.ensure_future(self.push_to_firebase(text))
+                #doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
                 
-                
-    async def push_to_firebase(self, text):
-        doc_ref = db.reference('/')
-        try:
-            doc_ref.child('STIStest').push(text)
-        except Exception as e:
-            print(f"not pushed to firebase: {e}")
+            
                 
     def sendMessageToDebug(self, msg, msgType):
         now = datetime.now()
