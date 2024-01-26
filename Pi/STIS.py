@@ -205,7 +205,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
 
-        with open("data.txt", 'a') as file:
+        with open('data1.txt', 'w') as file1, open('data2.txt', 'w') as file2:
             while self.serialChannels[buttonNumber-1].canReadLine():
                 text = self.serialChannels[buttonNumber-1].readLine()
                 text = text.data().decode()
@@ -215,8 +215,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 terminals[buttonNumber-1].append(text)
 
                 # Write received data to file
-                file.write(text + '\n')
-                file.flush()  # Ensure data is written immediately
+                file1.write(text + '\n')
+                file1.flush()
+                
+                file2.write(text + '\n')
+                file2.flush()
+                
+                # Ensure data is written immediately
                 #changed tests here
                 
                 

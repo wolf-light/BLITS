@@ -39,15 +39,15 @@ def upload_data_to_firebase(file_path, batch_size=10):
             # Upload batch to Firebase (assuming 'STIStest' as the child node)
             doc_ref.child('STIStest').push(''.join(batch))
         
-            """
+            
         # Clear the file after uploading
         with open(file_path, 'w') as file:
             file.truncate()
-            """
+            
         # Optionally, you can add a delay before the next check
         time.sleep(1)
 
 # Example usage
 if __name__ == "__main__":
-    data_file_path = "data.txt"
+    data_file_path = "data1.txt"
     upload_data_to_firebase(data_file_path)
