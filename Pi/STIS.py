@@ -27,6 +27,8 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import firestore
 
+import subprocess
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -45,6 +47,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("connected to firebase")
         except:
             print("failed to connect to firebase")
+            
+        try:
+            subprocess.run(["python", "trackingscript.py"])
+        except Exception as e:
+            print(f"something bad happened\n------------------")
+            
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
         self.comConnect2.clicked.connect(lambda: self.connectToSerial(2))
