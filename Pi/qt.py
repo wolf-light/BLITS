@@ -104,6 +104,10 @@ class MainWindow(QMainWindow):
         b.pressed.connect(self.start_upload)
         b.pressed.connect(self.start_test_dbfuncs)
 
+        s = QPushButton("stop")
+        s.pressed.connect(self.stop)
+        layout.addWidget(s)
+
         layout.addWidget(self.l)
         layout.addWidget(b)
 
@@ -144,12 +148,13 @@ class MainWindow(QMainWindow):
             temp[1] = str(temp[1])
             with self.lock:
                 self.data[temp[0]] = temp[1]
-                time.sleep(0.01)
+                time.sleep(0.1)
 
     def start_test_dbfuncs(self):
         worker = Worker(self.test_dbfuncs)
         self.threadpool.start(worker)
-
+    def stop(self):
+        self.stopped = True
     def upload(self, progress_callback):
         while True: 
             if self.stopped:
