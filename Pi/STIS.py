@@ -53,10 +53,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             print("failed to connect to firebase")
             
-        try:
-            subprocess.run(["python", "trackingscript.py"])
-        except Exception as e:
-            print(f"something bad happened\n------------------")
             
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))

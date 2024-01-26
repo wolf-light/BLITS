@@ -17,6 +17,8 @@ except Exception as e:
     print(f"Failed to connect to Firebase Realtime Database: {e}")
 
 def upload_data_to_firebase(file_path, batch_size=10):
+    
+    doc_ref = db.reference('/')
     while True:
         # Read data from the file
         with open(file_path, 'r') as file:
@@ -31,7 +33,7 @@ def upload_data_to_firebase(file_path, batch_size=10):
         for i in range(0, len(data_lines), batch_size):
             batch = data_lines[i:i + batch_size]
             # Upload batch to Firebase (assuming 'STIStest' as the child node)
-            db.child('STIStest').push(''.join(batch))
+            doc_ref.child('STIStest').push(''.join(batch))
 
         # Clear the file after uploading
         with open(file_path, 'w') as file:
@@ -42,5 +44,5 @@ def upload_data_to_firebase(file_path, batch_size=10):
 
 # Example usage
 if __name__ == "__main__":
-    data_file_path = "data.txt"
+    data_file_path = "./data.txt"
     upload_data_to_firebase(data_file_path)
