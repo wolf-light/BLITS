@@ -45,7 +45,7 @@ def upload_data_to_firebase(file_path, batch_size=10):
             file.truncate()
             
         # Optionally, you can add a delay before the next check
-        time.sleep(1)
+        
 
 # Example usage
 if __name__ == "__main__":
