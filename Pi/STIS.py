@@ -33,7 +33,7 @@ import threading
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     #global variable for subscript
-    #is_script_running = False
+    is_script_running = False
     
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -53,10 +53,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             print("failed to connect to firebase")
             
-        #try:
-        #    subprocess.run(["python", "trackingscript.py"])
-        #except Exception as e:
-        #    print(f"something bad happened\n------------------")
+        try:
+            subprocess.run(["python", "trackingscript.py"])
+        except Exception as e:
+            print(f"something bad happened\n------------------")
             
         
         self.comConnect1.clicked.connect(lambda: self.connectToSerial(1))
@@ -206,8 +206,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #file_name = f"data.txt"  # Change the file name as needed
         doc_ref = db.reference('/')
         
-        def push_to_firebase(data):
-            doc_ref.child('STIStest').push(data)
+
         
 
         with open("data.txt", 'a') as file:
@@ -225,7 +224,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 #changed tests here
                 
                 
-                threading.Thread(target=push_to_firebase, args=(text,)).start()
+                
                 #doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
