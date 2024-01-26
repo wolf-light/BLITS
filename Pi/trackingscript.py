@@ -21,7 +21,6 @@ except Exception as e:
 
 def upload_data_to_firebase(file_path, batch_size=10):
     
-    doc_ref = db.reference('/')
     while True:
         # Read data from the file
         with open(file_path, 'r') as file:
@@ -31,13 +30,15 @@ def upload_data_to_firebase(file_path, batch_size=10):
         if not data_lines:
             time.sleep(1)  # Sleep for a second before checking again
             continue
+        
 
+        
         # Upload data in batches to Firebase
         for i in range(0, len(data_lines), batch_size):
             batch = data_lines[i:i + batch_size]
             # Upload batch to Firebase (assuming 'STIStest' as the child node)
-            doc_ref.child('STIStest').push(''.join(batch))
-
+            doc_ref.child('STIStest').push(line.strip())
+        
         # Clear the file after uploading
         with open(file_path, 'w') as file:
             file.truncate()
@@ -47,5 +48,5 @@ def upload_data_to_firebase(file_path, batch_size=10):
 
 # Example usage
 if __name__ == "__main__":
-    data_file_path = "./data.txt"
+    data_file_path = "data.txt"
     upload_data_to_firebase(data_file_path)
