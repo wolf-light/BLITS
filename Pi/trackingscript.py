@@ -49,5 +49,5 @@ def upload_data_to_firebase(file_path, batch_size=10):
 
 # Example usage
 if __name__ == "__main__":
-    data_file_path = "data1.txt"
+    data_file_path = "data.txt"
     upload_data_to_firebase(data_file_path)
