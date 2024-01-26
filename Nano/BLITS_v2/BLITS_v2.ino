@@ -73,9 +73,9 @@ Adafruit_MCP9600 tc_1;
 Adafruit_MCP9600 tc_2;
 
 // Universal Variables
-STATE state = STATE::SAFE;
+STATE state = STATE::FIRE;
 String command;
-bool armState = false;
+bool armState = true;
 unsigned long readTime;
 
 // Times used in FIRE state of loop()
@@ -151,7 +151,7 @@ void print_system_info() {
   info += ") \n";
 
   print_both(info);
-  print_both(thermocouple_info(&tc_1, '1'));
+  print_both(thermocouple_info(&tc_1, '1'));      // Is this correct? Or is it just "tc_1"
   print_both(thermocouple_info(&tc_2, '2'));
 }
 
@@ -213,10 +213,12 @@ String sensor_read() {
   data += relativeTime;
   data += ",";
 
-  data += tc_1.readThermocouple();
+  // data += tc_1.readThermocouple();
+    data += 0.00;
   data += ",";
 
-  data += tc_2.readThermocouple();
+  // data += tc_2.readThermocouple();
+    data += 0.00;
   data += ",";
 
   data += LoadCell.get_units();
@@ -346,8 +348,8 @@ void prime_to_fire() {
       // delay(1000);
       // print_both("FIRE SEQUENCE");
       // print_both_int((millis() - now));
-      // relativeTime = (10000 - (millis() - now));
       relativeTime = 0;    //If we do a proper countdown, it messes up the formatting of our data in the cloud... maybe.
+      relativeTime = relativeTime + 0.0000000001;
       sensor_read();
     }
     state = STATE::FIRE;
@@ -359,12 +361,27 @@ void prime_to_fire() {
 void setup() {
   serial_setup();
   setup_loadcell();
-  setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
-  setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
+  // setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
+  // setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
   setup_ematch();
 }
 
+// command = "systest";
+
 void loop() {
+
+  // if (command == "systest") {
+  //   command = "start";
+  //   delay(400);
+  // } else if (command == "start") {
+  //   command = "yes";
+  //   delay(400);
+  // } else if (command == "yes") {
+  //   command = "fire";
+  //   delay(400);
+  // }
+
+
   if (CONTROL_SERIAL.available() > 0) {
     command = CONTROL_SERIAL.readString();
     if (command == "read data") {
