@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit One-Link</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css" />
+    <script src="edit.js"></script>
+    <link href="styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon"
+    href="https://images.squarespace-cdn.com/content/v1/620dae724c35bf16dd73a878/c2a52778-9074-49a7-959c-73b5caa94d0c/MNOrbitRefined.png?format=1500w">
+
+</head>
+
+<body onload="Check()">
+    <sitewrapper>
+        <h1>Edit Page</h1>
+
+
+        <!-- Form for adding or editing links -->
+        <div id="linkFormContainer">
+            <button onclick="signOut()">Sign Out</button>
+            <br>
+            <select id="nodeSelection" onchange="onNodeSelectionChange()">
+                <option value="links">Outreach/Recruiting (External Use)</option>
+                <option value="links2">Internal Team Use (Team use)</option>
+                <option value="podcast">PODCAST!!!</option>
+            </select>
+            <form id="linkForm">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required><br>
+
+                <label for="url">URL:</label>
+                <input type="url" id="url" name="url" required><br>
+
+                <label for="order">Display Order:</label>
+                <input type="order" id="order" name="order" required><br>
+
+                <label for="color">Color:</label>
+                <input type="color" id="color" name="color" required><br>
+
+                <button type="submit" id="addLinkBtn">Add Link</button>
+                <button type="submit" id="updateLinkBtn" style="display: none;">Update Link</button>
+            </form>
+            <h2>Existing Links:</h2>
+            <br>
+            <div id="linksContainer"></div>
+        </div>
+    </sitewrapper>
+
+
+  
+</body>
+
+<div id="firebaseui-auth-container"></div>
+
+</html>

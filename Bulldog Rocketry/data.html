@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Data Download</title>
+    <link rel="stylesheet" href="datastyles.css"> <!-- Include the stylesheet here -->
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Bulldog Rocketry</div>
+        <nav>
+            <ul>
+                <li><a href="https://www.bulldogrocketry.org" target="_blank">Website</a></li>
+                <li><a href="index.html">Home</a></li>
+                <!-- Add more navigation links as needed -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="graph-container">
+            <!-- Graphs will be dynamically added here -->
+        </section>
+    </main>
+
+    <button id="downloadButton">Download Data</button>
+    <div id="dataContainer"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script src="data.js"></script>
+    <script src="graphs.js"></script>
+</body>
+
+</html>

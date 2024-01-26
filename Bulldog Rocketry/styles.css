@@ -1,0 +1,350 @@
+html {
+  /* max-width: fit-content;
+  height: max-content; */
+  margin: auto;
+  height: max-content;
+  width: max-content;
+  /* background-color: #e22323; */
+}
+
+body {
+  background: linear-gradient(to right, #5b92ef, #085ae7);
+  background-color: #077eba;
+  background: url('https://images.squarespace-cdn.com/content/v1/620dae724c35bf16dd73a878/eb114621-6463-49fc-87d5-c17afa9a90c0/Screenshot+2023-10-12+at+7.26.53+PM.png?format=750w') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.5;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  /* height: 100%; */
+  /* width: 100%; */
+  transition: 2s ease-in-out;
+  transition-delay: 1s;
+  animation: fadeBackground 6s;
+  animation-fill-mode: forwards;
+  align-items: center;
+}
+
+#links-container {
+  /* opacity: 0;
+  transition: opacity 1s ease-in-out 2s; */
+  display: flex;
+  /* flex-wrap: wrap; */
+  flex-direction: column;
+  justify-content: center;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    /* transform: translateX(-100px); */
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeBackground {
+  0% {
+    background-color: #000;
+  }
+
+  100% {
+    background-color: #FFF;
+  }
+}
+
+.link {
+  display: block;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 50px;
+  border-color: black;
+  border: 2px;
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+  width: 400px;
+  opacity: 0;
+  transform: translateX(-100px);
+  animation: fade-in 1s ease-out forwards;
+}
+
+.link-box {
+  /* display: flex; */
+  align-items: center;
+  width: 400px;
+  height: auto;
+  margin: 10px;
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #000000;
+  /* display:none; */
+}
+
+.link-box .image {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.link-box .image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+
+.link-box .content {
+  flex: 1 1 auto;
+  padding-left: 10px;
+}
+
+.link-box .title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.link-box .description {
+  margin-bottom: 20px;
+}
+
+.title-container {
+  margin-bottom: 10px;
+}
+
+.description {
+  margin-top: 10px;
+}
+
+h0 {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 2rem 0;
+  color: #ff9018;
+  text-shadow: 2px 2px #1536f0;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0rem 0;
+  color: #632222;
+  text-shadow: 2px 2px #ffffff;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0rem 0;
+  color: #ffffff;
+  text-shadow: 2px 2px #632222;
+}
+
+h12 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 1rem 0;
+  color: #ffffff;
+  text-shadow: 1px 1px #1536f0;
+}
+
+h13 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 2rem 0;
+  color: #ff9018;
+  text-shadow: 1px 1px #1536f0;
+}
+
+h4 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0.3rem 0;
+  color: #000000;
+  text-shadow: 0.5px 0.5px #1536f0;
+}
+
+.header {
+  /* margin-top: 0.5rem; */
+  padding: 0rem;
+  border: 4px solid #000000;
+  /*background: linear-gradient(to right, #041f5f, #041f5f);*/
+  background-blend-mode: color-burn;
+  backdrop-filter: blur(10px);
+  color: #fff;
+  text-align: center;
+  align-self: center;
+  background-color: rgba(0, 0, 0, 0.664);
+  /* width: 1000px; */
+  width:90%;
+  /* overflow: hidden; */
+  margin: auto;
+}
+
+.not-allowed {
+  cursor: not-allowed;
+}
+
+.social-media-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.social-media-links a {
+  display: inline-block;
+  margin: 0 10px;
+  color: #000; /* Adjust icon color as needed */
+  font-size: 24px; /* Adjust icon size as needed */
+}
+
+.social-media-links a i {
+  transition: color 0.3s;
+}
+
+.social-media-links a:hover i {
+  color: #3b5998; /* Adjust hover color for each social media icon */
+}
+
+.sitewrapper {
+  display: contents;
+  justify-content: center;
+  align-items: center;
+  overflow: auto; /* or overflow: hidden; */
+  margin: auto; /* Center the sitewrapper horizontally */
+  /* max-width: 1000px; */
+}
+
+.headerimage {
+  /* max-width: 400px; */
+  max-width: 200px;
+}
+
+.overlay{
+    position: fixed;
+    display: block;
+    opacity:1;
+    background-color:hsl(0, 100%, 12%);
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+    z-index:1000;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+@media (max-width: 1200px) {
+
+  html,
+  body {
+    position: relative;
+    overflow-x: visible;
+    align-content: center;
+    align-items: center;
+    background-repeat: repeat;
+    /* background-color: black; */
+  }
+
+  .link {
+    display: block;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 50px;
+    border-color: black;
+    border: 2px;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(-100px);
+    animation: fade-in 1s ease-out forwards;
+    font-size: x-large;
+  }
+}
+
+@media (max-width: 1200px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 1000px;
+  }
+}
+
+@media (max-width: 1000px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 900px;
+  }
+}
+
+@media (max-width: 900px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 800px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 700px;
+  }
+}
+
+
+@media (max-width: 700px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 600px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 500px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 400px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 300px) {
+body, html, .sitewrapper {
+    width: 90%;
+    max-width: 200px;
+  }
+}
