@@ -1,6 +1,6 @@
 import time
-import pyrebase
-from pyrebase import pyrebase
+#import pyrebase
+#from pyrebase import pyrebase
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
@@ -37,7 +37,7 @@ def upload_data_to_firebase(file_path, batch_size=10):
         for i in range(0, len(data_lines), batch_size):
             batch = data_lines[i:i + batch_size]
             # Upload batch to Firebase (assuming 'STIStest' as the child node)
-            doc_ref.child('STIStest').push(line.strip())
+            doc_ref.child('STIStest').push(''.join(batch))
         
         # Clear the file after uploading
         with open(file_path, 'w') as file:
