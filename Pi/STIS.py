@@ -224,7 +224,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 
                 
                 
-                #doc_ref.child('STIStest').push(text)
+                doc_ref.child('STIStest').push(text)
                 # Optionally, you can print the received data
                 #print(text)
                 
