@@ -12,6 +12,7 @@ try:
         'databaseURL': 'https://bulldog-rocketry-a06cc-default-rtdb.firebaseio.com/testdata'
     })
     print("Connected to Firebase Realtime Database")
+    db.child('STIStest').push("tracking script functioning")
 except Exception as e:
     print(f"Failed to connect to Firebase Realtime Database: {e}")
 
