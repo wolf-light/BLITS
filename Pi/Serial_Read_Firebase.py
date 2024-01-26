@@ -20,7 +20,7 @@ def internetConnectionPresent(url="www.google.com", timeout=3):
     except:
         return False
  
-class dbfuncs:
+class DBfuncs:
     def __init__(self, max_points = 200):
         self.max_points = 200
         self.num_points_uploaded = 0
@@ -50,8 +50,9 @@ class dbfuncs:
             if self.stopped:
                 return
             with LOCK:
-                if (self.data and self.num_points_uploaded < 200 and len(self.data) > 3):
+                if (self.data and self.num_points_uploaded < 200 and len(self.data) >= 2):
                     self.pushtodb(self.data)
+                    self.num_points_uploaded += len(self.data)
                     self.data = {}
 
     def pushtodb(self, data: Dict[str,str]) -> bool:
@@ -61,7 +62,7 @@ class dbfuncs:
         self.db.collection("DataTest").document("ourDoc").set({"ThrustData": data}, merge = True)
 
 
-def sendtothread(serial_read: str, dbfunctions: dbfuncs):
+def sendtothread(serial_read: str, dbfunctions: DBfuncs):
     if serial_read == "COLLECT" or serial_read == "SAFING":
         return
     
@@ -88,7 +89,7 @@ def main():
 
     print("Serial connected!")
     print("initializing Database")
-    dbfunctions = dbfuncs().start()
+    dbfunctions = DBfuncs().start()
     print("Waiting for collect command. Outputting raw info now")
 
     # Constantly read and output what it reads from serial port
@@ -106,7 +107,7 @@ def main():
                     print(serial_read)
     
 def test_dbfuncs():
-    dbfunctions = dbfuncs().start()
+    dbfunctions = DBfuncs().start()
     with open('data_2.txt', 'r') as f:
         lines = f.readlines()
     for line in lines:
