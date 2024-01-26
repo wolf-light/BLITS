@@ -8,7 +8,7 @@ from threading import Thread, RLock
 from typing import Dict
 # Alterable Variables
 COM_PORT = "COM4"
-LOCK = RLock()
+
 
 # Checks Internet Connection
 def internetConnectionPresent(url="www.google.com", timeout=3):
@@ -27,6 +27,7 @@ class DBfuncs:
         self.stopped = False
         self.data = {}
         self.internetConnection = internetConnectionPresent()
+        self.lock = RLock()
         # Check for internet connection
         # If true: Set up Firebase, clear current ThrustData
         if (self.internetConnection):
@@ -49,7 +50,7 @@ class DBfuncs:
         while True: 
             if self.stopped:
                 return
-            with LOCK:
+            with self.lock:
                 if (self.data and self.num_points_uploaded < 200 and len(self.data) >= 2):
                     self.pushtodb(self.data)
                     self.num_points_uploaded += len(self.data)
@@ -69,7 +70,7 @@ def sendtothread(serial_read: str, dbfunctions: DBfuncs):
     temp = serial_read.split(",")
     temp[1] = float(temp[1]) * -1
     temp[1] = str(temp[1])
-    with LOCK:
+    with dbfunctions.lock:
         dbfunctions.data[temp[0]] = temp[1]
 
 #================Main================
@@ -117,5 +118,5 @@ def test_dbfuncs():
     dbfunctions.stop()
 
 if __name__ == "__main__":
-    #test_dbfuncs()
-    main()
+    test_dbfuncs()
+    #main()
