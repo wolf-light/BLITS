@@ -1,5 +1,5 @@
 # trackingscript.py
-
+from PyQt5.QtCore import QTimer
 import firebase_admin
 from firebase_admin import credentials, db
 import time
@@ -18,7 +18,7 @@ except Exception as e:
 data_file_path = './data.txt'
 
 # Reference to the Firebase Realtime Database
-ref = db.reference('STIStest')
+ref = db.reference('/')
 
 # Class to handle file system events (e.g., file changes)
 class MyHandler(FileSystemEventHandler):
@@ -72,6 +72,18 @@ if __name__ == "__main__":
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
     observer.start()
+    
+    timer = QTimer()
+    timer.timeout.connect(process_data)
+    timer.start(10000)
+    
+    try:
+        while True:
+            observer.join(1)
+    except KeyboardInterrupt:
+        observer.stop
+    
+    observer.join()
 
     try:
         while True:
