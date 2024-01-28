@@ -38,7 +38,7 @@ def upload_data_to_firebase():
         if lines_to_push:
             batch_push(lines_to_push)
         
-        time.sleep(1)
+        time.sleep(2)
 
 # Example usage
 if __name__ == "__main__":
