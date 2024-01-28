@@ -28,7 +28,7 @@ def upload_data_to_firebase():
             lines_to_push.append(line)
 
             # Push in batches of 100 lines
-            if len(lines_to_push) == 100:
+            if len(lines_to_push) == 50:
                 batch_push(lines_to_push)
                 lines_to_push = []
 
