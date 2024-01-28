@@ -219,11 +219,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 file.flush()  # Ensure data is written immediately
                 #changed tests here
                 
-                
-                
                 #doc_ref.child('STIStest').push(text)
-                # Optionally, you can print the received data
-                #print(text)
+                
+                threading.Thread(target=self.push_to_firebase_async, args=(doc_ref, text)).start()
+
+    def push_to_firebase_async(self, doc_ref, data):
+        try:
+            # Perform the push operation
+            result = doc_ref.child('STIStest').push(data)
+        except Exception as e:
+            print(f"Error pushing data to Firebase: {e}")
                 
             
                 
