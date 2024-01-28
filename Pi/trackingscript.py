@@ -19,35 +19,15 @@ try:
 except Exception as e:
     print(f"Failed to connect to Firebase Realtime Database: {e}")
 
-def upload_data_to_firebase(file_path, batch_size=10):
-    
-    while True:
-        # Read data from the file
-        with open(file_path, 'r') as file:
-            data_lines = file.readlines()
-
-        # Check if there is new data
-        if not data_lines:
-            time.sleep(1)  # Sleep for a second before checking again
-            continue
-        
-
-        
-        # Upload data in batches to Firebase
-        for i in range(0, len(data_lines), batch_size):
-            batch = data_lines[i:i + batch_size]
-            # Upload batch to Firebase (assuming 'STIStest' as the child node)
-            doc_ref.child('STIStest').push(''.join(batch))
-        
-            """
-        # Clear the file after uploading
-        with open(file_path, 'w') as file:
-            file.truncate()
-            """
-        # Optionally, you can add a delay before the next check
-        time.sleep(1)
+def upload_data_to_firebase():
+    with open('dataref.txt', 'r') as file:
+        line_number = 1
+        for line in file:
+            line = line.strip()
+            doc_ref.child('STIStest').set(line)
+            line_number += 1
 
 # Example usage
 if __name__ == "__main__":
     data_file_path = "data.txt"
-    upload_data_to_firebase(data_file_path)
+    upload_data_to_firebase()
