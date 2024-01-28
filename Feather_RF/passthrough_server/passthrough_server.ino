@@ -44,12 +44,12 @@ void debug_print(String message) {
 
 bool setup_debug_serial() {
   DEBUG_SERIAL.begin(DEBUG_BAUDRATE);
-  #ifdef DEBUG_SERIAL
+  // #ifdef DEBUG_SERIAL
   // while (!DEBUG_SERIAL) {
   //   ;
   // }
   DEBUG_SERIAL.println("debug serial initialized");
-  #endif
+  // #endif
   return true;
 }
 

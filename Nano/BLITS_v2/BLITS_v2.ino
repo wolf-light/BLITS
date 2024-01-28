@@ -73,9 +73,9 @@ Adafruit_MCP9600 tc_1;
 Adafruit_MCP9600 tc_2;
 
 // Universal Variables
-STATE state = STATE::FIRE;
+STATE state = STATE::SAFE;
 String command;
-bool armState = true;
+bool armState = false;
 unsigned long readTime;
 
 // Times used in FIRE state of loop()
@@ -213,13 +213,13 @@ String sensor_read() {
   data += relativeTime;
   data += ",";
 
-  // data += tc_1.readThermocouple();
-    data += 0.00;
+  data += tc_1.readThermocouple();
+    // data += 0.00;
   data += ",";
 
   // data += tc_2.readThermocouple();
-    data += 0.00;
-  data += ",";
+  //   data += 0.00;
+  // data += ",";
 
   data += LoadCell.get_units();
   data += ",";
@@ -361,7 +361,7 @@ void prime_to_fire() {
 void setup() {
   serial_setup();
   setup_loadcell();
-  // setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
+  setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
   // setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
   setup_ematch();
 }
