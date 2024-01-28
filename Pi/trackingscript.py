@@ -17,7 +17,7 @@ except Exception as e:
 def batch_push(lines):
     # You might want to adjust 'STIStest' based on your data structure
     doc_ref.child('STIStest').push(lines)
-    time.sleep(.01)
+    time.sleep(.015)
 
 def upload_data_to_firebase():
     with open('data.txt', 'r') as file:
