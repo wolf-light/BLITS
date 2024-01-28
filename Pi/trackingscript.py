@@ -44,6 +44,7 @@ def upload_data_to_firebase():
 # Example usage
 if __name__ == "__main__":
     data_file_path = "data.txt"
+    time.sleep(30)
     try:
         upload_data_to_firebase()
     except Exception as e:
