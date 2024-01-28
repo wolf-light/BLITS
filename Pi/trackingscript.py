@@ -17,6 +17,7 @@ except Exception as e:
 def batch_push(lines):
     # You might want to adjust 'STIStest' based on your data structure
     doc_ref.child('STIStest').push(lines)
+    time.sleep(.01)
 
 def upload_data_to_firebase():
     with open('data.txt', 'r') as file:
@@ -38,7 +39,7 @@ def upload_data_to_firebase():
         if lines_to_push:
             batch_push(lines_to_push)
         
-        time.sleep(2)
+        
 
 # Example usage
 if __name__ == "__main__":
