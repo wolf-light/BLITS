@@ -24,7 +24,7 @@ def upload_data_to_firebase():
         line_number = 1
         for line in file:
             line = line.strip()
-            doc_ref.child('STIStest').set(line)
+            doc_ref.child('STIStest').push(line)
             line_number += 1
 
 # Example usage
