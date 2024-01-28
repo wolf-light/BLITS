@@ -20,7 +20,7 @@ except Exception as e:
     print(f"Failed to connect to Firebase Realtime Database: {e}")
 
 def upload_data_to_firebase():
-    with open('dataref.txt', 'r') as file:
+    with open('data.txt', 'r') as file:
         line_number = 1
         for line in file:
             line = line.strip()

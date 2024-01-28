@@ -221,7 +221,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 
                 #doc_ref.child('STIStest').push(text)
                 
-                threading.Thread(target=self.push_to_firebase_async, args=(doc_ref, text)).start()
+                #threading.Thread(target=self.push_to_firebase_async, args=(doc_ref, text)).start()
 
     def push_to_firebase_async(self, doc_ref, data):
         try:
