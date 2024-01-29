@@ -217,9 +217,9 @@ String sensor_read() {
     // data += 0.00;
   data += ",";
 
-  // data += tc_2.readThermocouple();
+  data += tc_2.readThermocouple();
   //   data += 0.00;
-  // data += ",";
+  data += ",";
 
   data += LoadCell.get_units();
   data += ",";
@@ -362,7 +362,7 @@ void setup() {
   serial_setup();
   setup_loadcell();
   setup_thermocouple(&tc_1, I2C_ADDRESS_1, TC_1_TYPE);
-  // setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
+  setup_thermocouple(&tc_2, I2C_ADDRESS_2, TC_2_TYPE);
   setup_ematch();
 }
 
